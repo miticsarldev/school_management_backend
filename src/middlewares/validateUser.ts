@@ -3,7 +3,7 @@ import Joi from "joi";
 import JoiPasswordComplexity, {
   ComplexityOptions,
 } from "joi-password-complexity";
-import { IUser } from "../types/models.type";
+import { IUser } from "../types/model.user.type";
 
 const myComplexity: ComplexityOptions = {
   min: 8,

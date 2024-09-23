@@ -1,6 +1,6 @@
 import { CallbackError, model, Schema } from "mongoose";
 import bcrypt from "bcryptjs";
-import { IUser } from "../types/models.type";
+import { IUser } from "../types/model.user.type";
 
 // Schema utilisateur
 const UserSchema = new Schema<IUser>({
