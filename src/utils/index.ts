@@ -1,7 +1,7 @@
 import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
 import { NextFunction, Request, Response } from "express";
-import { IUser } from "../types/models.type";
+import { IUser } from "../types/model.user.type";
 
 export const generateAccessToken = (email: string) => {
   return jwt.sign({ email }, process.env.ACCESS_TOKEN_SECRET as string, {
