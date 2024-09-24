@@ -1,8 +1,11 @@
 import mongoose, { ConnectOptions } from "mongoose";
+import exam_typeRoutes from "./routes/exam_typeRoutes";
 import { config } from "dotenv";
 config();
 
 import app from "./app";
+
+app.use('/api',exam_typeRoutes)
 
 const PORT = process.env.PORT || 4444;
 
@@ -17,7 +20,7 @@ const options: ConnectOptions & ConnectionOptionsExtend = {
 };
 
 mongoose
-  .connect(process.env.MONGO_URI as string, options)
+  .connect(process.env.MONGO_URI as string)
   .then(() => {
     console.log("MongoDB connected");
     app.listen(PORT, () => {
