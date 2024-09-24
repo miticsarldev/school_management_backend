@@ -1,5 +1,5 @@
 import { Schema, model, Document } from 'mongoose';
-import { IHomework } from '../types/IHomework';
+import { IHomework } from '../types/model.homework.type';
 
 const homeworkSchema = new Schema<IHomework>({
   classe_id: {
