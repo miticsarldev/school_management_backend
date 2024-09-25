@@ -50,11 +50,19 @@ export const updateCourse = async (req: Request, res: Response) => {
     const { id } = req.params;
     const { name, number_of_hours, description, id_user, id_grade, id_classroom, statuses } = req.body;
 
+    // Vérifiez si un autre cours avec le même nom existe déjà
+    const existingCourse = await Course.findOne({ name });
+    if (existingCourse && existingCourse._id.toString() !== id) {
+      return res.status(400).json({ message: "Un cours avec ce nom existe déjà" });
+    }
+
+    // Trouver le cours par ID
     const course = await Course.findById(id);
     if (!course) {
       return res.status(404).json({ message: "Cours introuvable" });
     }
 
+    // Mise à jour des champs
     course.name = name;
     course.number_of_hours = number_of_hours;
     course.description = description;
@@ -69,6 +77,7 @@ export const updateCourse = async (req: Request, res: Response) => {
     res.status(500).json({ message: "Erreur de serveur" });
   }
 };
+
 
 // Supprimer un cours
 export const deleteCourse = async (req: Request, res: Response) => {
