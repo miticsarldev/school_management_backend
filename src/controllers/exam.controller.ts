@@ -1,4 +1,3 @@
-// controllers/exam.controller.ts
 import { Request, Response } from 'express';
 import Exam from '../models/exam.model';
 
