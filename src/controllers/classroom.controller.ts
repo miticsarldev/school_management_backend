@@ -35,27 +35,6 @@ export const getClassrooms = async (req: Request, res: Response) => {
 };
 
 //  Modifier une classroom
-// export const updateClassroom = async (req: Request, res: Response) => {
-//   try {
-//     const { id } = req.params;
-//     const { name, capacity, statuses } = req.body;
-
-//     const classroom = await Classroom.findById(id);
-//     if (!classroom) {
-//       return res.status(404).json({ message: "Salle de classe introuvable" });
-//     }
-
-//     classroom.name = name;
-//     classroom.capacity = capacity;
-//     classroom.statuses = statuses;
-
-//     await classroom.save();
-//     res.json({ message: "Salle de classe mise à jour avec succès", classroom });
-//   } catch (error) {
-//     res.status(500).json({ message: "Erreur de serveur" });
-//   }
-// };
-
 export const updateClassroom = async (req: Request, res: Response) => {
     try {
       const { id } = req.params;
