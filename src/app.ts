@@ -4,6 +4,8 @@ import path from "path";
 import cookieParser from "cookie-parser";
 import authRoutes from "./routes/authRoutes";
 import courseRoutes from "./routes/course.routes";
+import Classroom from "./models/Classroom";
+import classroomRoutes from "./routes/classroom.routes";
 
 const app = express();
 
@@ -27,5 +29,6 @@ app.get("/", (req, res) => {
 // Routes
 app.use("/api", authRoutes);
 app.use("/api", courseRoutes);
+app.use("/api", classroomRoutes);
 
 export default app;
