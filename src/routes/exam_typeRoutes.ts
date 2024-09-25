@@ -1,4 +1,3 @@
-// routes/exam_type.routes.ts
 import { Router } from "express";
 import {
     createExamType,

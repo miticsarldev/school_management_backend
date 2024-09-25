@@ -1,4 +1,3 @@
-// controllers/exam_type.controller.ts
 import { Request, Response } from "express";
 import ExamType from "../models/exam_type.model";
 

@@ -5,6 +5,8 @@ config();
 
 import app from "./app";
 
+
+//routes pour exam_type
 app.use('/api',exam_typeRoutes)
 
 const PORT = process.env.PORT || 4444;
