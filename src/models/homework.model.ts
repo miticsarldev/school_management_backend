@@ -1,4 +1,4 @@
-import { Schema, model, Document } from 'mongoose';
+import { Schema, model} from 'mongoose';
 import { IHomework } from '../types/model.homework.type';
 
 const homeworkSchema = new Schema<IHomework>({
