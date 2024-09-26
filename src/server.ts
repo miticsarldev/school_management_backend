@@ -1,8 +1,12 @@
 import mongoose, { ConnectOptions } from "mongoose";
+import attendanceRoutes from './routes/attendanceRoutes';
 import { config } from "dotenv";
 config();
 
 import app from "./app";
+
+//routes pour attendance
+app.use('/api',attendanceRoutes)
 
 const PORT = process.env.PORT || 4444;
 
@@ -17,7 +21,7 @@ const options: ConnectOptions & ConnectionOptionsExtend = {
 };
 
 mongoose
-  .connect(process.env.MONGO_URI as string, options)
+  .connect(process.env.MONGO_URI as string)
   .then(() => {
     console.log("MongoDB connected");
     app.listen(PORT, () => {
