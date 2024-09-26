@@ -3,7 +3,7 @@ import cors from "cors";
 import path from "path";
 import cookieParser from "cookie-parser";
 import authRoutes from "./routes/authRoutes";
-
+import payrollRoutes from "./routes/PayrollRoutes";
 const app = express();
 
 // Middleware for the CORS
@@ -25,5 +25,5 @@ app.get("/", (req, res) => {
 
 // Routes
 app.use("/api", authRoutes);
-
+app.use("/api", payrollRoutes);
 export default app;
