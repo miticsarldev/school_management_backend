@@ -14,7 +14,7 @@ export const addExam = async (req: Request, res: Response) => {
 // Récupérer tous les examens
 export const getExams = async (req: Request, res: Response) => {
     try {
-        const exams = await Exam.find().populate('exam_type_id'); // Optionnel: utilisez `populate` si vous souhaitez obtenir les détails de `exam_type`
+        const exams = await Exam.find().populate('exam_type_id');
         res.status(200).json(exams);
     } catch (error) {
         res.status(500).json({ message: "Erreur lors de la récupération des examens", error });
