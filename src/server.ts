@@ -1,16 +1,10 @@
 import mongoose from "mongoose";
 import { config } from "dotenv";
-import tuitionFeeRoutes from "./routes/tuitionFeeRoutes";
-import eventRoutes from "./routes/eventRoutes";
 import app from "./app";
 
 // Charger les variables d'environnement
 config();
 
-// Utilisation des routes
-app.use("/api/tuition-fees", tuitionFeeRoutes);
-// Utilisation des routes d'événements
-app.use("/api", eventRoutes);
 // Configurer le port
 const PORT = process.env.PORT ?? 4444;
 
