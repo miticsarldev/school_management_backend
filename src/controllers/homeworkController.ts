@@ -34,6 +34,28 @@ export const deleteHomework = async (req: Request, res: Response) => {
   }
 };
 
+// Récupérer un devoir par son ID
+export const getHomeworkById = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+
+    // Vérifier que l'ID est bien fourni
+    if (!id) {
+      return res.status(400).json({ message: "ID du devoir manquant" });
+    }
+
+    const homework = await HomeworkModel.findById(id);
+
+    if (!homework) {
+      return res.status(404).json({ message: "Devoir non trouvé" });
+    }
+    res.status(200).json(homework);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Erreur lors de la récupération du devoir", error });
+  }
+};
+
 export const getHomeworks = async (req: Request, res: Response) => {
   try {
     const homeworks = await HomeworkModel.find();
