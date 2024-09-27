@@ -3,6 +3,8 @@ import cors from "cors";
 import path from "path";
 import cookieParser from "cookie-parser";
 import authRoutes from "./routes/authRoutes";
+import attendanceRoutes from './routes/attendanceRoutes';
+
 
 const app = express();
 
@@ -25,5 +27,8 @@ app.get("/", (req, res) => {
 
 // Routes
 app.use("/api", authRoutes);
+
+//routes pour attendance
+app.use('/api',attendanceRoutes)
 
 export default app;

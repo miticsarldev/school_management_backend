@@ -1,12 +1,10 @@
 import mongoose, { ConnectOptions } from "mongoose";
-import attendanceRoutes from './routes/attendanceRoutes';
 import { config } from "dotenv";
 config();
 
 import app from "./app";
 
-//routes pour attendance
-app.use('/api',attendanceRoutes)
+
 
 const PORT = process.env.PORT || 4444;
 
