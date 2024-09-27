@@ -3,6 +3,9 @@ import cors from "cors";
 import path from "path";
 import cookieParser from "cookie-parser";
 import authRoutes from "./routes/authRoutes";
+import exam_typeRoutes from "./routes/exam_typeRoutes";
+import examRoutes from "./routes/examRoutes";
+import examResultRoutes from "./routes/exam_resultRoutes";
 
 const app = express();
 
@@ -25,5 +28,14 @@ app.get("/", (req, res) => {
 
 // Routes
 app.use("/api", authRoutes);
+
+//routes pour exam_type
+app.use('/api',exam_typeRoutes)
+
+//routes pour exam 
+app.use('/api/exams', examRoutes);
+
+//routes pour exam_result
+app.use('/api',examResultRoutes);
 
 export default app;
