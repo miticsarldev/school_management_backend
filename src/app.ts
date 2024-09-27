@@ -7,6 +7,7 @@ import exam_typeRoutes from "./routes/exam_typeRoutes";
 import examRoutes from "./routes/examRoutes";
 import examResultRoutes from "./routes/exam_resultRoutes";
 import schoolRoutes from "./routes/schoolRoutes";
+import examSheduleRoutes from "./routes/exam_sheduleRoutes";
 
 const app = express();
 
@@ -41,5 +42,8 @@ app.use('/api',examResultRoutes);
 
 //routes pour school
 app.use('/api',schoolRoutes);
+
+//routes pour exam shedule
+app.use('/api',examSheduleRoutes);
 
 export default app;
