@@ -3,11 +3,13 @@ import cors from "cors";
 import path from "path";
 import cookieParser from "cookie-parser";
 import authRoutes from "./routes/authRoutes";
+import payrollRoutes from "./routes/PayrollRoutes";
 import timetableRoute from "./routes/timetableRoute";
 import courseRoutes from "./routes/course.routes";
 import classroomRoutes from "./routes/classroom.routes";
 import gradeRoutes from "./routes/grade.routes";
 import attendanceRoutes from "./routes/attendanceRoutes";
+
 
 const app = express();
 
@@ -30,6 +32,7 @@ app.get("/", (req, res) => {
 
 // Routes
 app.use("/api", authRoutes);
+app.use("/api", payrollRoutes);
 app.use("/api", timetableRoute);
 app.use("/api", courseRoutes);
 app.use("/api", classroomRoutes);
