@@ -10,18 +10,18 @@ import {
 const router = Router();
 
 // Route pour créer un paiement de frais de scolarité
-router.post("/", createTuitionFee);
+router.post("/tuition-fees", createTuitionFee);
 
 // Route pour obtenir tous les paiements de frais de scolarité
-router.get("/", getAllTuitionFees);
+router.get("/tuition-fees", getAllTuitionFees);
 
 // Route pour obtenir un paiement de frais de scolarité par ID
-router.get("/:id", getTuitionFeeById);
+router.get("/tuition-fees:id", getTuitionFeeById);
 
 // Route pour mettre à jour un paiement de frais de scolarité
-router.put("/:id", updateTuitionFee);
+router.put("/tuition-fees:id", updateTuitionFee);
 
 // Route pour supprimer un paiement de frais de scolarité
-router.delete("/:id", deleteTuitionFee);
+router.delete("/tuition-fees:id", deleteTuitionFee);
 
 export default router;
