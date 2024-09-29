@@ -24,7 +24,7 @@ const app = express();
 // Middleware for the CORS
 // Allowing all origins
 const corsOptions = {
-  origin: "*",
+  origin: "http://localhost:5173",
   credentials: true,
   optionSuccessStatus: 200,
 };

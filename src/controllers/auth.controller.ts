@@ -174,9 +174,12 @@ export const deleteUser = async (req: Request, res: Response) => {
 
 export const login = async (req: Request, res: Response) => {
   try {
-    const { email, password } = req.body;
+    const { email, telephone, username, password } = req.body;
 
-    const user = await User.findOne({ email });
+    const user = await User.findOne({
+      $or: [{ email: email }, { telephone: telephone }, { username: username }],
+    });
+
     if (!user) {
       return res
         .status(400)
@@ -184,6 +187,7 @@ export const login = async (req: Request, res: Response) => {
     }
 
     const isMatch = await user.comparePassword(password);
+
     if (!isMatch) {
       return res
         .status(400)
