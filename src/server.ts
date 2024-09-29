@@ -2,11 +2,10 @@ import mongoose from "mongoose";
 import { config } from "dotenv";
 import app from "./app";
 
+const PORT = process.env.PORT || 4444;
+
 // Charger les variables d'environnement
 config();
-
-// Configurer le port
-const PORT = process.env.PORT ?? 4444;
 
 // Connexion à MongoDB
 mongoose

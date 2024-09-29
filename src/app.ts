@@ -3,6 +3,7 @@ import cors from "cors";
 import path from "path";
 import cookieParser from "cookie-parser";
 import authRoutes from "./routes/authRoutes";
+import exam_typeRoutes from "./routes/exam_typeRoutes";
 import tuitionFeeRoutes from "./routes/tuitionFeeRoutes";
 import eventRoutes from "./routes/eventRoutes";
 import leaveRoutes from "./routes/leaveRoutes";
@@ -51,5 +52,8 @@ app.use("/api", gradeRoutes);
 app.use("/api", attendanceRoutes);
 app.use("/api", homeworkRoute);
 
+
+//routes pour exam_type
+app.use('/api',exam_typeRoutes)
 
 export default app;
