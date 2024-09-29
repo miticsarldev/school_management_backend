@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { Payroll } from "../models/Payroll.model";
+import { Payroll } from "../models/Payroll";
 
 // Créer un nouveau paiement
 export const createPayroll = async (req: Request, res: Response) => {
@@ -12,7 +12,9 @@ export const createPayroll = async (req: Request, res: Response) => {
     res.status(201).json(savedPayroll);
   } catch (err) {
     console.error(err);
-    res.status(400).json({ message: "Erreur lors de l'ajout du paiement", err });
+    res
+      .status(400)
+      .json({ message: "Erreur lors de l'ajout du paiement", err });
   }
 };
 
@@ -34,7 +36,9 @@ export const getPayrollById = async (req: Request, res: Response) => {
     res.status(200).json(payroll);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Erreur lors de la récupération du paiement", error });
+    res
+      .status(500)
+      .json({ message: "Erreur lors de la récupération du paiement", error });
   }
 };
 
@@ -45,7 +49,9 @@ export const getAllPayrolls = async (req: Request, res: Response) => {
     res.status(200).json(payrolls);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Erreur lors de la récupération des paiements", error });
+    res
+      .status(500)
+      .json({ message: "Erreur lors de la récupération des paiements", error });
   }
 };
 
@@ -56,7 +62,11 @@ export const updatePayroll = async (req: Request, res: Response) => {
     const { montant, statut } = req.body;
 
     // Mettre à jour le paiement
-    const payroll = await Payroll.findByIdAndUpdate(id, { montant, statut }, { new: true });
+    const payroll = await Payroll.findByIdAndUpdate(
+      id,
+      { montant, statut },
+      { new: true }
+    );
     if (!payroll) {
       return res.status(404).json({ message: "Paiement non trouvé" });
     }
@@ -64,7 +74,9 @@ export const updatePayroll = async (req: Request, res: Response) => {
     res.status(200).json(payroll);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Erreur lors de la mise à jour du paiement", error });
+    res
+      .status(500)
+      .json({ message: "Erreur lors de la mise à jour du paiement", error });
   }
 };
 
@@ -82,6 +94,8 @@ export const deletePayroll = async (req: Request, res: Response) => {
     res.status(200).json({ message: "Paiement supprimé avec succès" });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Erreur lors de la suppression du paiement", error });
+    res
+      .status(500)
+      .json({ message: "Erreur lors de la suppression du paiement", error });
   }
 };

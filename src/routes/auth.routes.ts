@@ -9,7 +9,7 @@ import {
   refreshToken,
   register,
   updateUser,
-} from "../controllers/authController";
+} from "../controllers/auth.controller";
 import upload from "../middlewares/upload";
 
 const router = Router();

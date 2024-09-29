@@ -2,22 +2,22 @@ import express from "express";
 import cors from "cors";
 import path from "path";
 import cookieParser from "cookie-parser";
-import authRoutes from "./routes/authRoutes";
-import exam_typeRoutes from "./routes/exam_typeRoutes";
-import tuitionFeeRoutes from "./routes/tuitionFeeRoutes";
-import eventRoutes from "./routes/eventRoutes";
-import leaveRoutes from "./routes/leaveRoutes";
-import payrollRoutes from "./routes/PayrollRoutes";
-import timetableRoute from "./routes/timetableRoute";
+import authRoutes from "./routes/auth.routes";
+import exam_typeRoutes from "./routes/exam_type.routes";
+import tuitionFeeRoutes from "./routes/tuition_fee.routes";
+import eventRoutes from "./routes/event.routes";
+import leaveRoutes from "./routes/leave.routes";
+import payrollRoutes from "./routes/payroll.routes";
+import timetableRoute from "./routes/timetable.routes";
 import courseRoutes from "./routes/course.routes";
 import classroomRoutes from "./routes/classroom.routes";
 import gradeRoutes from "./routes/grade.routes";
-import attendanceRoutes from "./routes/attendanceRoutes";
-import homeworkRoute from "./routes/homeworkRoute";
-import examRoutes from "./routes/examRoutes";
-import examResultRoutes from "./routes/exam_resultRoutes";
-import schoolRoutes from "./routes/schoolRoutes";
-import examSheduleRoutes from "./routes/exam_sheduleRoutes";
+import attendanceRoutes from "./routes/attendance.routes";
+import homeworkRoute from "./routes/homework.routes";
+import examRoutes from "./routes/exam.routes";
+import examResultRoutes from "./routes/exam_result.routes";
+import schoolRoutes from "./routes/school.routes";
+import examSheduleRoutes from "./routes/exam_shedule.routes";
 
 const app = express();
 
@@ -87,6 +87,6 @@ app.use("/api", examResultRoutes);
 app.use("/api", schoolRoutes);
 
 //routes pour exam shedule
-app.use('/api',examSheduleRoutes);
+app.use("/api", examSheduleRoutes);
 
 export default app;

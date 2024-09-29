@@ -1,5 +1,11 @@
 import { Router } from "express";
-import { createPayroll,getPayrollById, getAllPayrolls, updatePayroll, deletePayroll } from "../controllers/PayrollController";
+import {
+  createPayroll,
+  getPayrollById,
+  getAllPayrolls,
+  updatePayroll,
+  deletePayroll,
+} from "../controllers/payroll.controller";
 
 const router = Router();
 

@@ -1,5 +1,10 @@
 import { Router } from "express";
-import { createLeave, getAllLeaves, updateLeave, deleteLeave } from "../controllers/leaveController";
+import {
+  createLeave,
+  getAllLeaves,
+  updateLeave,
+  deleteLeave,
+} from "../controllers/leave.controller";
 
 const router = Router();
 

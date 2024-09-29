@@ -5,7 +5,7 @@ import {
   getTuitionFeeById,
   updateTuitionFee,
   deleteTuitionFee,
-} from "../controllers/tuitionfeeController";
+} from "../controllers/tuitionfee.controller";
 
 const router = Router();
 
