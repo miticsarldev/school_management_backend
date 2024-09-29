@@ -3,10 +3,12 @@ import cors from "cors";
 import path from "path";
 import cookieParser from "cookie-parser";
 import authRoutes from "./routes/authRoutes";
-import timetableRoute from "./routes/timetableRoute"
+import timetableRoute from "./routes/timetableRoute";
 import courseRoutes from "./routes/course.routes";
 import classroomRoutes from "./routes/classroom.routes";
 import gradeRoutes from "./routes/grade.routes";
+import attendanceRoutes from "./routes/attendanceRoutes";
+
 const app = express();
 
 // Middleware for the CORS
@@ -32,5 +34,8 @@ app.use("/api", timetableRoute);
 app.use("/api", courseRoutes);
 app.use("/api", classroomRoutes);
 app.use("/api", gradeRoutes);
+
+//routes pour attendance
+app.use("/api", attendanceRoutes);
 
 export default app;
