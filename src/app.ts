@@ -13,7 +13,6 @@ import classroomRoutes from "./routes/classroom.routes";
 import gradeRoutes from "./routes/grade.routes";
 import attendanceRoutes from "./routes/attendanceRoutes";
 
-
 const app = express();
 
 // Middleware for the CORS
@@ -41,7 +40,6 @@ app.use("/api", tuitionFeeRoutes);
 app.use("/api", eventRoutes);
 // Utilisation des routes pour les demandes de congés et absences
 app.use("/api", leaveRoutes);
-=======
 app.use("/api", payrollRoutes);
 app.use("/api", timetableRoute);
 app.use("/api", courseRoutes);
@@ -50,6 +48,5 @@ app.use("/api", gradeRoutes);
 
 //routes pour attendance
 app.use("/api", attendanceRoutes);
-
 
 export default app;
