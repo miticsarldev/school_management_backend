@@ -1,10 +1,10 @@
 import { Router } from "express";
 import {
-    createExamType,
-    getAllExamTypes,
-    getExamTypeById,
-    updateExamType,
-    deleteExamType,
+  createExamType,
+  getAllExamTypes,
+  getExamTypeById,
+  updateExamType,
+  deleteExamType,
 } from "../controllers/exam_type.controller";
 
 const router = Router();
@@ -20,7 +20,6 @@ router.get("/exam-types/:id", getExamTypeById);
 
 // Route pour mettre à jour un type d'examen par ID
 router.put("/exam-types/:id", updateExamType);
-
 
 // Route pour supprimer un type d'examen par ID
 router.delete("/exam-types/:id", deleteExamType);

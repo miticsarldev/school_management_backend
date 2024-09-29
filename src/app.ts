@@ -14,6 +14,7 @@ import classroomRoutes from "./routes/classroom.routes";
 import gradeRoutes from "./routes/grade.routes";
 import attendanceRoutes from "./routes/attendanceRoutes";
 import homeworkRoute from "./routes/homeworkRoute";
+import examRoutes from "./routes/examRoutes";
 
 const app = express();
 
@@ -52,8 +53,13 @@ app.use("/api", gradeRoutes);
 app.use("/api", attendanceRoutes);
 app.use("/api", homeworkRoute);
 
+//routes pour exam_type
+app.use("/api", exam_typeRoutes);
 
 //routes pour exam_type
-app.use('/api',exam_typeRoutes)
+app.use("/api", exam_typeRoutes);
+
+//routes pour exam
+app.use("/api/exams", examRoutes);
 
 export default app;
