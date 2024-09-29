@@ -1,24 +1,32 @@
-import mongoose from "mongoose";
+import mongoose, { ConnectOptions } from "mongoose";
 import { config } from "dotenv";
+config();
+
 import app from "./app";
 
 const PORT = process.env.PORT || 4444;
 
-// Charger les variables d'environnement
-config();
+type ConnectionOptionsExtend = {
+  useNewUrlParser: boolean;
+  useUnifiedTopology: boolean;
+};
 
-// Connexion à MongoDB
+const options: ConnectOptions & ConnectionOptionsExtend = {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+};
+
+// MongoDB connection
 mongoose
-  .connect(process.env.MONGO_URI as string)
+  .connect(process.env.MONGO_URI as string, options)
   .then(() => {
     console.log("MongoDB connected");
 
-    // Démarrer le serveur uniquement après la connexion réussie à MongoDB
     app.listen(PORT, () => {
       console.log(`Server running on port ${PORT}`);
     });
   })
   .catch((error) => {
     console.error("MongoDB connection error:", error);
-    process.exit(1); // Fermer l'application en cas d'échec de connexion
+    process.exit(1);
   });
