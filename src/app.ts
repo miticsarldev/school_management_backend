@@ -4,7 +4,16 @@ import path from "path";
 import cookieParser from "cookie-parser";
 import authRoutes from "./routes/authRoutes";
 import exam_typeRoutes from "./routes/exam_typeRoutes";
-
+import tuitionFeeRoutes from "./routes/tuitionFeeRoutes";
+import eventRoutes from "./routes/eventRoutes";
+import leaveRoutes from "./routes/leaveRoutes";
+import payrollRoutes from "./routes/PayrollRoutes";
+import timetableRoute from "./routes/timetableRoute";
+import courseRoutes from "./routes/course.routes";
+import classroomRoutes from "./routes/classroom.routes";
+import gradeRoutes from "./routes/grade.routes";
+import attendanceRoutes from "./routes/attendanceRoutes";
+import homeworkRoute from "./routes/homeworkRoute";
 
 const app = express();
 
@@ -27,6 +36,22 @@ app.get("/", (req, res) => {
 
 // Routes
 app.use("/api", authRoutes);
+// Utilisation des routes
+app.use("/api", tuitionFeeRoutes);
+// Utilisation des routes d'événements
+app.use("/api", eventRoutes);
+// Utilisation des routes pour les demandes de congés et absences
+app.use("/api", leaveRoutes);
+app.use("/api", payrollRoutes);
+app.use("/api", timetableRoute);
+app.use("/api", courseRoutes);
+app.use("/api", classroomRoutes);
+app.use("/api", gradeRoutes);
+
+//routes pour attendance
+app.use("/api", attendanceRoutes);
+app.use("/api", homeworkRoute);
+
 
 //routes pour exam_type
 app.use('/api',exam_typeRoutes)
