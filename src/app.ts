@@ -6,6 +6,13 @@ import authRoutes from "./routes/authRoutes";
 import tuitionFeeRoutes from "./routes/tuitionFeeRoutes";
 import eventRoutes from "./routes/eventRoutes";
 import leaveRoutes from "./routes/leaveRoutes";
+import payrollRoutes from "./routes/PayrollRoutes";
+import timetableRoute from "./routes/timetableRoute";
+import courseRoutes from "./routes/course.routes";
+import classroomRoutes from "./routes/classroom.routes";
+import gradeRoutes from "./routes/grade.routes";
+import attendanceRoutes from "./routes/attendanceRoutes";
+
 
 const app = express();
 
@@ -34,4 +41,15 @@ app.use("/api", tuitionFeeRoutes);
 app.use("/api", eventRoutes);
 // Utilisation des routes pour les demandes de congés et absences
 app.use("/api", leaveRoutes);
+=======
+app.use("/api", payrollRoutes);
+app.use("/api", timetableRoute);
+app.use("/api", courseRoutes);
+app.use("/api", classroomRoutes);
+app.use("/api", gradeRoutes);
+
+//routes pour attendance
+app.use("/api", attendanceRoutes);
+
+
 export default app;

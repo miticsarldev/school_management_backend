@@ -13,7 +13,7 @@ mongoose
   .connect(process.env.MONGO_URI as string)
   .then(() => {
     console.log("MongoDB connected");
-    
+
     // Démarrer le serveur uniquement après la connexion réussie à MongoDB
     app.listen(PORT, () => {
       console.log(`Server running on port ${PORT}`);
@@ -21,5 +21,5 @@ mongoose
   })
   .catch((error) => {
     console.error("MongoDB connection error:", error);
-    process.exit(1);  // Fermer l'application en cas d'échec de connexion
+    process.exit(1); // Fermer l'application en cas d'échec de connexion
   });
