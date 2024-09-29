@@ -12,6 +12,7 @@ import courseRoutes from "./routes/course.routes";
 import classroomRoutes from "./routes/classroom.routes";
 import gradeRoutes from "./routes/grade.routes";
 import attendanceRoutes from "./routes/attendanceRoutes";
+import homeworkRoute from "./routes/homeworkRoute";
 
 const app = express();
 
@@ -48,5 +49,7 @@ app.use("/api", gradeRoutes);
 
 //routes pour attendance
 app.use("/api", attendanceRoutes);
+app.use("/api", homeworkRoute);
+
 
 export default app;
