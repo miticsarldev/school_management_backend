@@ -13,6 +13,11 @@ const LeaveSchema = new Schema<ILeave>({
     ref: "Timetable", // Référence à l'emploi du temps
     required: true,
   },
+  exam_id: {
+    type: Schema.Types.ObjectId,
+    ref: "Exam", // Référence à l'examen
+    required: true,
+  },
   status: {
     type: Boolean,
     default: false, // Statut par défaut: non approuvé
