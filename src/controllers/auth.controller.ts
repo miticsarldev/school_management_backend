@@ -204,6 +204,7 @@ export const login = async (req: Request, res: Response) => {
     res.cookie("refreshToken", refreshToken, { httpOnly: true, secure: true });
     res.json({ user: user, accessToken });
   } catch (error) {
+    console.log(error);
     res.status(500).json({ message: "Server error" });
   }
 };
