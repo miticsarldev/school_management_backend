@@ -65,6 +65,50 @@ export const register = async (req: Request, res: Response) => {
     res.status(500).json({ message: "Server error" });
   }
 };
+// Récupérer tous les utilisateurs de rôle "etudiant" liés à un parent spécifique
+export const getAllUsersStudentByParentId = async (req: Request, res: Response) => {
+  try {
+    const parentId = req.params.parentId; // On suppose que l'ID du parent est passé dans les paramètres de la requête
+    const students = await User.find({ role: "etudiant", parent: parentId });
+    if (students.length === 0) {
+      return res.status(404).json({ message: "Aucun étudiant trouvé pour ce parent." });
+    }
+    res.status(200).json(students);
+  } catch (error) {
+    res.status(500).json({ message: "Erreur serveur." });
+  }
+};
+// Assigner un parent à un étudiant et vice-versa
+export const assignParentToStudent = async (req: Request, res: Response) => {
+  try {
+    const { studentId, parentId } = req.body;
+
+    // Vérifier si le parent et l'étudiant existent
+    const parent = await User.findById(parentId);
+    const student = await User.findById(studentId);
+
+    if (!parent || parent.role !== "parent") {
+      return res.status(404).json({ message: "Parent non trouvé ou rôle incorrect." });
+    }
+
+    if (!student || student.role !== "etudiant") {
+      return res.status(404).json({ message: "Étudiant non trouvé ou rôle incorrect." });
+    }
+
+    // Assigner l'étudiant au parent
+    student.parent = parentId;
+    await student.save();
+  
+    // Ajouter l'étudiant dans la liste des enfants du parent
+    parent.children.push(studentId);
+    await parent.save();
+
+    res.status(200).json({ message: "Parent et étudiant assignés avec succès." });
+  } catch (error) {
+    res.status(500).json({ message: "Erreur lors de l'assignation du parent à l'étudiant." });
+  }
+};
+
 
 export const getUsers = async (req: Request, res: Response) => {
   try {

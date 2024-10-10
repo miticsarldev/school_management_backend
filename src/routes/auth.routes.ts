@@ -3,6 +3,7 @@ import { Router } from "express";
 import { validateUser } from "../middlewares/validateUser";
 import {
   deleteUser,
+  getAllUsersStudentByParentId,
   getUsers,
   login,
   logout,
@@ -29,6 +30,7 @@ router.post("/logout", logout);
 // Get all users
 router.get("/users", getUsers);
 
+router.get("/students-by-parent/:id", getAllUsersStudentByParentId);
 // Update user
 router.patch("/users/:id", validateUser, upload, updateUser);
 
