@@ -85,7 +85,7 @@ const UserSchema = new Schema<IUser>({
   },
   role: {
     type: String,
-    enum: ["administrateur", "enseignant", "etudiant"],
+    enum: ["administrateur", "enseignant", "etudiant", "parent", "gardien"],
     default: "etudiant",
   },
   status: {
@@ -93,6 +93,10 @@ const UserSchema = new Schema<IUser>({
     enum: ["actif", "inactif"],
     default: "actif",
   },
+  children: [
+    { type: Schema.Types.ObjectId, ref: "User" }
+    ],
+  parent: { type: Schema.Types.ObjectId, ref: "User" },
   lastLogin: {
     type: Date,
     default: Date.now,
