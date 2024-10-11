@@ -66,7 +66,9 @@ export const getHomeworkById = async (req: Request, res: Response) => {
 
 export const getHomeworks = async (req: Request, res: Response) => {
   try {
-    const homeworks = await HomeworkModel.find();
+    const homeworks = await HomeworkModel.find()
+    .populate("cours_id", "course_name")  
+      .populate("classroom_id", "classroom_name");
     res.status(200).json(homeworks);
   } catch (error) {
     res.status(500).json({ message: "Error fetching homework", error });
