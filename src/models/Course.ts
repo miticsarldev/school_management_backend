@@ -16,15 +16,15 @@ const CourseSchema = new Schema({
     trim: true,
   },
   id_user: {
-    type: Number,
+    type: Schema.Types.ObjectId,
     required: true,
   },
   id_grade: {
-    type: Number,
+    type: Schema.Types.ObjectId,
     required: true,
   },
   id_classroom: {
-    type: Number,
+    type: Schema.Types.ObjectId,
     required: true,
   },
   statuses: {

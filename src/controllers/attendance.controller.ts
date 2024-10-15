@@ -147,3 +147,65 @@ export const getAttendanceByUser = async (req: Request, res: Response) => {
       }); // Gestion des erreurs
   }
 };
+
+// Contrôleur pour récupérer les statistiques de présence des étudiants et des enseignants
+export const getAttendanceStats = async (req: Request, res: Response) => {
+  try {
+    const studentAttendances = await Attendance.aggregate([
+      { $match: { student_id: { $ne: null } } }, // Filtrer les présences des étudiants
+      {
+        $group: {
+          _id: "$status", // Regrouper par statut (présent ou absent)
+          count: { $sum: 1 }, // Compter le nombre de présences
+        },
+      },
+    ]);
+
+    const teacherAttendances = await Attendance.aggregate([
+      { $match: { teacher_id: { $ne: null } } }, // Filtrer les présences des enseignants
+      {
+        $group: {
+          _id: "$status", // Regrouper par statut (présent ou absent)
+          count: { $sum: 1 }, // Compter le nombre de présences
+        },
+      },
+    ]);
+
+    const studentStats = {
+      present: studentAttendances.find(stat => stat._id === true)?.count || 0,
+      absent: studentAttendances.find(stat => stat._id === false)?.count || 0,
+    };
+
+    const teacherStats = {
+      present: teacherAttendances.find(stat => stat._id === true)?.count || 0,
+      absent: teacherAttendances.find(stat => stat._id === false)?.count || 0,
+    };
+
+    res.json({ studentStats, teacherStats }); // Répondre avec les statistiques
+  } catch (error) {
+    res.status(500).json({
+      message: "Erreur lors de la récupération des statistiques de présence",
+      error,
+    }); // Gestion des erreurs
+  }
+};
+
+// Contrôleur pour récupérer toutes les présences avec informations des clés étrangères
+export const getAllAttendances = async (req: Request, res: Response) => {
+  try {
+    // Récupérer toutes les présences et peupler les informations des utilisateurs et de l'emploi du temps
+    const attendances = await Attendance.find()
+      .populate('student_id', 'firstname lastname') // Peupler avec les champs firstname et lastname de l'utilisateur étudiant
+      .populate('teacher_id', 'firstname lastname') // Peupler avec les champs firstname et lastname de l'utilisateur enseignant
+      .populate('timetable_id'); // Peupler toutes les informations de l'emploi du temps
+
+    console.log("Présences récupérées:", attendances);
+    res.json(attendances); // Réponse avec la liste des présences peuplées
+  } catch (error) {
+    console.error("Erreur dans getAllAttendances:", error);
+    res.status(500).json({
+      message: "Erreur lors de la récupération de toutes les présences",
+      error,
+    }); // Gestion des erreurs
+  }
+};
