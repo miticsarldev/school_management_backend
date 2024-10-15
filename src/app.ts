@@ -11,6 +11,7 @@ import payrollRoutes from "./routes/payroll.routes";
 import timetableRoute from "./routes/timetable.routes";
 import courseRoutes from "./routes/course.routes";
 import classroomRoutes from "./routes/classroom.routes";
+import classroom_etudiantRoutes from "./routes/classroom_etudiant.routes";
 import gradeRoutes from "./routes/grade.routes";
 import attendanceRoutes from "./routes/attendance.routes";
 import homeworkRoute from "./routes/homework.routes";
@@ -50,29 +51,12 @@ app.use("/api", payrollRoutes);
 app.use("/api", timetableRoute);
 app.use("/api", courseRoutes);
 app.use("/api", classroomRoutes);
+app.use("/api", classroom_etudiantRoutes);
 app.use("/api", gradeRoutes);
 
 //routes pour attendance
 app.use("/api", attendanceRoutes);
 app.use("/api", homeworkRoute);
-
-//routes pour exam_type
-app.use("/api", exam_typeRoutes);
-
-//routes pour exam_type
-app.use("/api", exam_typeRoutes);
-
-//routes pour exam
-app.use("/api/exams", examRoutes);
-
-//routes pour exam_type
-app.use("/api", exam_typeRoutes);
-
-//routes pour exam
-app.use("/api/exams", examRoutes);
-
-//routes pour exam_result
-app.use("/api", examResultRoutes);
 
 //routes pour exam_type
 app.use("/api", exam_typeRoutes);
