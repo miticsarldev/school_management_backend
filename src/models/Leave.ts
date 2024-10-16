@@ -19,10 +19,15 @@ const LeaveSchema = new Schema<ILeave>({
     required: true,
   },
   status: {
-    type: Boolean,
-    default: false, // Statut par défaut: non approuvé
+    type: String,
+    enum: ["validate", "cancel", "pending"], // Statut par défaut: non approuvé
+    default : "pending"
   },
-  date: {
+  dateDebut: {
+    type: Date,
+    required: true,
+  },
+  dateFin: {
     type: Date,
     required: true,
   },
