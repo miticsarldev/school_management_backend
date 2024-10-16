@@ -30,7 +30,7 @@ export const updateAttendance = async (req: Request, res: Response) => {
       new: true,
     }); // Mise à jour de la présence
     if (!attendance) {
-      return res.status(404).json({ message: "Présence non trouvée" }); // Gestion de l'absence de la présence
+      return res.status(404).json({ message: "Présence non trouvée" }); // Gestion de l'présence de la présence
     }
     res.json({ message: "Présence mise à jour avec succès", attendance }); // Réponse avec succès
   } catch (error) {
@@ -68,21 +68,26 @@ export const getAllAttendancesParentId = async (req: Request, res: Response) => 
 
     // Récupérer les IDs des étudiants (enfants)
     const studentIds = students.map(student => student._id);
-console.log(studentIds);
-    // Récupérer les absences associées aux étudiants
-    const attendances = await Attendance.find({ student_id: { $in: studentIds } });
+    console.log(studentIds); // Bon pour le débogage
+
+    // Récupérer les présences associées aux étudiants
+    const attendances = await Attendance.find({ student_id: { $in: studentIds } })
+      .populate('student_id', 'firstname lastname') // Peupler avec les champs firstname et lastname de l'utilisateur étudiant
+      .populate('teacher_id', 'firstname lastname') // Peupler avec les champs firstname et lastname de l'utilisateur enseignant
+      .populate('timetable_id'); // Peupler toutes les informations de l'emploi du temps
 
     if (attendances.length === 0) {
-      return res.status(404).json({ message: "Aucune absence trouvé pour les étudiants de ce parent.", parentId });
+      return res.status(404).json({ message: "Aucune présence trouvée pour les étudiants de ce parent.", parentId });
     }
 
-    // Retourner la liste des absences
+    // Retourner la liste des présences
     res.status(200).json(attendances);
   } catch (error) {
     console.error(error); // Pour mieux diagnostiquer l'erreur
     res.status(500).json({ message: "Erreur serveur." });
   }
 };
+
 // Contrôleur pour exporter les présences au format CSV
 export const exportAttendanceToCSV = async (req: Request, res: Response) => {
   const { timetable_id } = req.params; // Récupération de l'identifiant de l'emploi du temps à partir des paramètres

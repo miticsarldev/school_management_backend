@@ -17,7 +17,7 @@ export const addTimetable = async (req: Request, res: Response) => {
 // Consulter tous les emplois du temps
 export const getTimetables = async (req: Request, res: Response) => {
   try {
-    const timetables = await Timetable.find();
+    const timetables = await Timetable.find().populate("cours_id").populate("id_users").populate("classroom_id");
     res.status(200).json(timetables);
   } catch (error) {
     res
