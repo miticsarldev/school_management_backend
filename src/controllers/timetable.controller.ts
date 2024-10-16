@@ -15,17 +15,24 @@ export const addTimetable = async (req: Request, res: Response) => {
 };
 
 // Consulter tous les emplois du temps
+
 export const getTimetables = async (req: Request, res: Response) => {
   try {
+<<<<<<< HEAD
     const timetables = await Timetable.find().populate("cours_id").populate("id_users").populate("classroom_id");
+=======
+    const timetables = await Timetable.find()
+      .populate("cours_id", "name") 
+      .populate("id_users", "name email")  
+      .populate("classroom_id", "name"); // Champs de la salle de classe
+
+>>>>>>> caebbd06622884fb01b839b601c2ba3597819b72
     res.status(200).json(timetables);
   } catch (error) {
-    res
-      .status(500)
-      .json({
-        message: "Erreur lors de la récupération des emplois du temps",
-        error,
-      });
+    res.status(500).json({
+      message: "Erreur lors de la récupération des emplois du temps",
+      error,
+    });
   }
 };
 
@@ -66,5 +73,28 @@ export const deleteTimetable = async (req: Request, res: Response) => {
         message: "Erreur lors de la suppression de l'emploi du temps",
         error,
       });
+  }
+};
+// Récupérer un emploi du temps par ID
+export const getTimetableById = async (req: Request, res: Response) => {
+  try {
+    const timetableId = req.params.id;
+    
+    // Rechercher l'emploi du temps par ID et peupler les références
+    const timetable = await Timetable.findById(timetableId)
+      .populate("cours_id", "name") // Remplacez 'course_name' par les champs nécessaires
+      .populate("id_users", "name email") // Remplacez 'name', 'email' par les champs nécessaires
+      .populate("classroom_id", "name"); // Champs de la salle de classe
+
+    if (!timetable) {
+      return res.status(404).json({ message: "Emploi du temps non trouvé" });
+    }
+
+    res.status(200).json(timetable);
+  } catch (error) {
+    res.status(500).json({
+      message: "Erreur lors de la récupération de l'emploi du temps",
+      error,
+    });
   }
 };

@@ -45,7 +45,8 @@ export const getPayrollById = async (req: Request, res: Response) => {
 // Récupérer tous les paiements
 export const getAllPayrolls = async (req: Request, res: Response) => {
   try {
-    const payrolls = await Payroll.find();
+    const payrolls = await Payroll.find()
+    .populate("id_users", "name email role")
     res.status(200).json(payrolls);
   } catch (error) {
     console.error(error);
