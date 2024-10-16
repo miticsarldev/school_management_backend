@@ -16,15 +16,18 @@ const CourseSchema = new Schema({
     trim: true,
   },
   id_user: {
-    type: Number,
+    type: Schema.Types.ObjectId,
+    ref: "User", // Référence au prof
     required: true,
   },
   id_grade: {
-    type: Number,
+    type: Schema.Types.ObjectId,
+    ref: "Grade", // Référence à la note
     required: true,
   },
-  id_classroom: {
-    type: Number,
+  id_classroom_etudiant: {
+    type: Schema.Types.ObjectId,
+    ref: "ClassroomEtudiant", // Référence à la classe
     required: true,
   },
   statuses: {

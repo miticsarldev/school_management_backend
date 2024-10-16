@@ -1,5 +1,7 @@
 import { Request, Response } from "express";
 import ExamResult from "../models/ExamResult";
+import mongoose from "mongoose";
+import User from "../models/User";
 
 // Créer un nouveau résultat d'examen
 export const createExamResult = async (req: Request, res: Response) => {
@@ -40,6 +42,45 @@ export const getAllExamResults = async (req: Request, res: Response) => {
       message: "Error fetching exam results",
       error: error, // Ajout de plus d'informations sur l'erreur
     });
+  }
+};
+// Lister tous les resultats selon un parent
+export const getAllExam_resultsParentId = async (req: Request, res: Response) => {
+  try {
+    const parentId = req.params.student_id; // On suppose que l'ID du parent est passé dans les paramètres de la requête
+
+    // Vérifier si l'ID passé est un ObjectId valide
+    if (!mongoose.Types.ObjectId.isValid(parentId)) {
+      return res.status(400).json({ message: "ID du parent invalide." });
+    }
+
+    const parentObjectId = new mongoose.Types.ObjectId(parentId);
+
+    // Récupérer tous les étudiants associés au parent
+    const students = await User.find({ parent: parentObjectId, role: "etudiant" });
+
+    if (students.length === 0) {
+      return res.status(404).json({ message: "Aucun étudiant trouvé pour ce parent.", parentId });
+    }
+
+    // Récupérer les IDs des étudiants (enfants)
+    const studentIds = students.map(student => student._id);
+
+    // Récupérer les résultats d'examens associés aux étudiants
+    const exam_results = await ExamResult.find({ student_id: { $in: studentIds } })
+      .populate('exam_id')    // Peupler les informations sur l'examen
+      .populate('course_id') // Peupler les informations sur le cours
+      .populate('student_id'); // Peupler les informations sur l'etudiant
+
+    if (exam_results.length === 0) {
+      return res.status(404).json({ message: "Aucun résultat trouvé pour les étudiants de ce parent.", parentId });
+    }
+
+    // Retourner la liste des résultats d'examens
+    res.status(200).json(exam_results);
+  } catch (error) {
+    console.error(error); // Pour mieux diagnostiquer l'erreur
+    res.status(500).json({ message: "Erreur serveur." });
   }
 };
 

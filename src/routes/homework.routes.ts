@@ -9,10 +9,12 @@ import {
 
 const router = Router();
 // Route pour créer un Homework
-router.post("/homework", addHomework);
-router.get("/homework/:id", getHomeworkById);
-router.get("/homework", getHomeworks);
-router.put("/homework/:id", updateHomework);
-router.delete("/homework/:id", deleteHomework);
+router.post("/homeworks", addHomework);
+router.get("/homeworks/:id", getHomeworkById);
+router.get("/homeworks", getHomeworks);
+// Route pour lister tous les devoirs par parent
+//router.get("/events-by-user/:classroom_id", getAllHomeworksParentId);
+router.put("/homeworks/:id", updateHomework);
+router.delete("/homeworks/:id", deleteHomework);
 
 export default router;

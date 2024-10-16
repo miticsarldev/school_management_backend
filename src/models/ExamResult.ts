@@ -11,7 +11,7 @@ const ExamResultSchema = new Schema<IExam_Result>(
     },
     student_id: {
       type: Schema.Types.ObjectId,
-      ref: "Student",
+      ref: "User",
       required: true,
     },
     course_id: {
