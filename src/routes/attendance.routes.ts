@@ -26,9 +26,18 @@ router.get('/attendances/timetable/:timetable_id', getAttendanceByTimeTable);
 router.get('/attendances/export/:timetable_id', exportAttendanceToCSV);
 
 // Récupérer les présences pour un utilisateur spécifique (étudiant)
+
 router.get('/attendances/user/:user_id', getAttendanceByUser);
 // Route pour obtenir toutes les attendances 
 router.get("/attendances", getAllAttendances);
 // Route pour supprimer une attendance 
 router.delete("/attendances/:id", deleteAttendance);
+
+router.get('/attendance/user/:user_id', getAttendanceByUser);
+
+// Route pour obtenir les statistiques de présence
+router.get('/attendance/stats', getAttendanceStats);
+
+// Route pour obtenir toutes les attendances 
+router.get("/attendances", getAllAttendances);
 export default router;

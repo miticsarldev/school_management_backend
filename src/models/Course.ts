@@ -22,7 +22,6 @@ const CourseSchema = new Schema({
   },
   id_grade: {
     type: Schema.Types.ObjectId,
-    ref: "Grade", // Référence à la note
     required: true,
   },
   id_classroom_etudiant: {
