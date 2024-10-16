@@ -2,6 +2,7 @@ import { Request, Response } from "express"; // Importation des types Request et
 import Attendance from "../models/Attendance"; // Importation du modèle Attendance
 import { createObjectCsvWriter } from "csv-writer"; // Importation de la fonction pour écrire des fichiers CSV
 import User from "../models/User";
+import mongoose from "mongoose";
 
 // Contrôleur pour enregistrer une nouvelle présence
 export const createAttendance = async (req: Request, res: Response) => {
@@ -51,7 +52,37 @@ export const getAttendanceByTimeTable = async (req: Request, res: Response) => {
       .json({ message: "Erreur lors de la récupération des présences", error }); // Gestion des erreurs
   }
 };
+export const getAllAttendancesParentId = async (req: Request, res: Response) => {
+  try {
+    const parentId = req.params.parent_id; // On suppose que l'ID du parent est passé dans les paramètres de la requête
+    
+    // Convertir parentId en ObjectId si nécessaire
+    const parentObjectId = new mongoose.Types.ObjectId(parentId);
 
+    // Récupérer tous les enfants associés au parent
+    const students = await User.find({ parent: parentObjectId, role: "etudiant" });
+
+    if (students.length === 0) {
+      return res.status(404).json({ message: "Aucun étudiant trouvé pour ce parent.", parentId });
+    }
+
+    // Récupérer les IDs des étudiants (enfants)
+    const studentIds = students.map(student => student._id);
+console.log(studentIds);
+    // Récupérer les absences associées aux étudiants
+    const attendances = await Attendance.find({ student_id: { $in: studentIds } });
+
+    if (attendances.length === 0) {
+      return res.status(404).json({ message: "Aucune absence trouvé pour les étudiants de ce parent.", parentId });
+    }
+
+    // Retourner la liste des absences
+    res.status(200).json(attendances);
+  } catch (error) {
+    console.error(error); // Pour mieux diagnostiquer l'erreur
+    res.status(500).json({ message: "Erreur serveur." });
+  }
+};
 // Contrôleur pour exporter les présences au format CSV
 export const exportAttendanceToCSV = async (req: Request, res: Response) => {
   const { timetable_id } = req.params; // Récupération de l'identifiant de l'emploi du temps à partir des paramètres
@@ -112,7 +143,25 @@ export const exportAttendanceToCSV = async (req: Request, res: Response) => {
       .json({ message: "Erreur lors de l'exportation des présences", error }); // Gestion des erreurs
   }
 };
+// Contrôleur pour récupérer toutes les présences avec informations des clés étrangères
+export const getAllAttendances = async (req: Request, res: Response) => {
+  try {
+    // Récupérer toutes les présences et peupler les informations des utilisateurs et de l'emploi du temps
+    const attendances = await Attendance.find()
+      .populate('student_id', 'firstname lastname') // Peupler avec les champs firstname et lastname de l'utilisateur étudiant
+      .populate('teacher_id', 'firstname lastname') // Peupler avec les champs firstname et lastname de l'utilisateur enseignant
+      .populate('timetable_id'); // Peupler toutes les informations de l'emploi du temps
 
+    console.log("Présences récupérées:", attendances);
+    res.json(attendances); // Réponse avec la liste des présences peuplées
+  } catch (error) {
+    console.error("Erreur dans getAllAttendances:", error);
+    res.status(500).json({
+      message: "Erreur lors de la récupération de toutes les présences",
+      error,
+    }); // Gestion des erreurs
+  }
+};
 // Contrôleur pour récupérer les présences d'un utilisateur spécifique
 export const getAttendanceByUser = async (req: Request, res: Response) => {
   const { user_id } = req.params; // Récupération de l'identifiant de l'utilisateur à partir des paramètres
@@ -145,5 +194,20 @@ export const getAttendanceByUser = async (req: Request, res: Response) => {
           "Erreur lors de la récupération des présences de l'utilisateur",
         error,
       }); // Gestion des erreurs
+  }
+};
+// Supprimer une attendance
+export const deleteAttendance = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+
+    const attendance = await Attendance.findByIdAndDelete(id);
+    if (!attendance) {
+      return res.status(404).json({ message: "Présence introuvable" });
+    }
+
+    res.json({ message: "Présence de l'etudiant supprimée avec succès" });
+  } catch (error) {
+    res.status(500).json({ message: "Erreur de serveur" });
   }
 };

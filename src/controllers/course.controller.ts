@@ -35,7 +35,7 @@ export const createCourse = async (req: Request, res: Response) => {
 // afficher tous les cours
 export const getCourses = async (req: Request, res: Response) => {
   try {
-    const courses = await Course.find();
+    const courses = await Course.find().populate("id_classroom_etudiant").populate("id_grade").populate("id_user");
     res.json(courses);
   } catch (error) {
     res.status(500).json({ message: "Erreur de serveur" });
@@ -48,13 +48,13 @@ export const updateCourse = async (req: Request, res: Response) => {
     const { name, number_of_hours, description, id_user, id_grade, id_classroom_etudiant, statuses } = req.body;
 
     // Vérifiez si un autre cours avec le même nom existe déjà
-    const existingCourse = await Course.findOne({ name });
+    const existingCourse = await Course.findOne({ name }).populate("id_classroom_etudiant").populate("id_grade").populate("id_user");
     if (existingCourse && existingCourse._id.toString() !== id) {
       return res.status(400).json({ message: "Un cours avec ce nom existe déjà" });
     }
 
     // Trouver le cours par ID
-    const course = await Course.findById(id);
+    const course = await Course.findById(id).populate("id_classroom_etudiant").populate("id_grade").populate("id_user");
     if (!course) {
       return res.status(404).json({ message: "Cours introuvable" });
     }
@@ -97,7 +97,7 @@ export const getCourseById = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
 
-    const course = await Course.findById(id);
+    const course = await Course.findById(id).populate("id_classroom_etudiant").populate("id_grade").populate("id_user");
     if (!course) {
       return res.status(404).json({ message: "Cours introuvable" });
     }

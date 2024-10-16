@@ -19,15 +19,15 @@ const TimetableSchema = new Schema<ITimetable>({
         ref: "Classroom" // Référence à la salle de classe
     },  
     day: { 
-        type: String, 
+        type: Date, 
         required: true 
     },  
     start_time: { 
-        type: String, 
+        type: Date, 
         required: true 
     },  
     end_time: { 
-        type: String, 
+        type: Date, 
         required: true 
     }, 
 });

@@ -21,7 +21,7 @@ export const createClassroomEtudiant = async (req: Request, res: Response) => {
 // Afficher toutes les classroomEtudiants
 export const getClassroomEtudiants = async (req: Request, res: Response) => {
   try {
-    const classroomEtudiants = await ClassroomEtudiant.find();
+    const classroomEtudiants = await ClassroomEtudiant.find().find().populate("classroom_id").populate("student_id");
     res.json(classroomEtudiants);
   } catch (error) {
     res.status(500).json({ message: "Erreur de serveur" });
@@ -73,7 +73,7 @@ export const getClassroomEtudiantById = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
 
-    const classroomEtudiant = await ClassroomEtudiant.findById(id);
+    const classroomEtudiant = await ClassroomEtudiant.findById(id).populate("classroom_id").populate("student_id");
     if (!classroomEtudiant) {
       return res.status(404).json({ message: "Salle de classe de l'etudiant introuvable" });
     }

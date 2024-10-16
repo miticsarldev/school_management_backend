@@ -6,16 +6,40 @@ import User from "../models/User";
 // Créer un nouveau résultat d'examen
 export const createExamResult = async (req: Request, res: Response) => {
   try {
-    const { exam_id, student_id, course_id, grade, comments, status } =
-      req.body;
+    const { exam_id, student_id, course_id, grade, comments } = req.body;
 
+    // Définir le statut en fonction de la note (grade)
+    let status = "Incomplet"; // Par défaut
+    if (typeof grade === 'number') {
+      if (grade < 10) {
+        status = "Échoué";
+      } else if (grade >= 10 && grade < 20) {
+        status = "Réussi";
+      } 
+    }
+    // if (typeof grade === 'number') {
+    //   if (grade < 10) {
+    //     status = "Échoué";
+    //   } else if (grade >= 10 && grade < 12) {
+    //     status = "Passable";
+    //   } else if (grade >= 12 && grade < 14) {
+    //     status = "Assez bien";
+    //   } else if (grade >= 14 && grade < 16) {
+    //     status = "Bien";
+    //   } else if (grade >= 16 && grade < 18) {
+    //     status = "Très bien";
+    //   } else if (grade >= 18 && grade <= 20) {
+    //     status = "Excellent";
+    //   }
+    // }
+    
     const newExamResult = new ExamResult({
       exam_id,
       student_id,
       course_id,
       grade,
       comments,
-      status,
+      status, // Attribuer le status calculé
     });
 
     const savedExamResult = await newExamResult.save();
@@ -27,6 +51,7 @@ export const createExamResult = async (req: Request, res: Response) => {
     res.status(500).json({ message: "Error creating exam result", error });
   }
 };
+
 
 // Obtenir tous les résultats d'examen
 export const getAllExamResults = async (req: Request, res: Response) => {
@@ -48,30 +73,23 @@ export const getAllExamResults = async (req: Request, res: Response) => {
 export const getAllExam_resultsParentId = async (req: Request, res: Response) => {
   try {
     const parentId = req.params.student_id; // On suppose que l'ID du parent est passé dans les paramètres de la requête
-
     // Vérifier si l'ID passé est un ObjectId valide
     if (!mongoose.Types.ObjectId.isValid(parentId)) {
       return res.status(400).json({ message: "ID du parent invalide." });
     }
-
     const parentObjectId = new mongoose.Types.ObjectId(parentId);
-
     // Récupérer tous les étudiants associés au parent
     const students = await User.find({ parent: parentObjectId, role: "etudiant" });
-
     if (students.length === 0) {
       return res.status(404).json({ message: "Aucun étudiant trouvé pour ce parent.", parentId });
     }
-
     // Récupérer les IDs des étudiants (enfants)
     const studentIds = students.map(student => student._id);
-
     // Récupérer les résultats d'examens associés aux étudiants
     const exam_results = await ExamResult.find({ student_id: { $in: studentIds } })
       .populate('exam_id')    // Peupler les informations sur l'examen
       .populate('course_id') // Peupler les informations sur le cours
       .populate('student_id'); // Peupler les informations sur l'etudiant
-
     if (exam_results.length === 0) {
       return res.status(404).json({ message: "Aucun résultat trouvé pour les étudiants de ce parent.", parentId });
     }
@@ -102,14 +120,32 @@ export const getExamResultById = async (req: Request, res: Response) => {
 // Mettre à jour un résultat d'examen
 export const updateExamResult = async (req: Request, res: Response) => {
   try {
+    const { grade, ...updateFields } = req.body;
+
+    // Définir le statut en fonction de la note (grade)
+    let status = "Incomplet"; // Par défaut
+    if (typeof grade === 'number') {
+      if (grade < 10) {
+        status = "Échoué";
+      } else if (grade >= 10 && grade < 20) {
+        status = "Réussi";
+      } 
+    }
+
+    // Ajouter le statut recalculé aux champs à mettre à jour
+    const updateData = { ...updateFields, grade, status };
+
+    // Mettre à jour le résultat d'examen
     const updatedExamResult = await ExamResult.findByIdAndUpdate(
       req.params.id,
-      { $set: req.body },
+      { $set: updateData },
       { new: true, runValidators: true }
     );
+
     if (!updatedExamResult) {
       return res.status(404).json({ message: "Exam result not found" });
     }
+
     res.status(200).json({
       message: "Exam result updated successfully",
       exam_result: updatedExamResult,
@@ -118,6 +154,7 @@ export const updateExamResult = async (req: Request, res: Response) => {
     res.status(500).json({ message: "Error updating exam result", error });
   }
 };
+
 
 // Supprimer un résultat d'examen
 export const deleteExamResult = async (req: Request, res: Response) => {

@@ -4,6 +4,7 @@ import { Homework } from "../models/Homework";
 import mongoose from "mongoose";
 import ExamResult from "../models/ExamResult";
 import User from "../models/User";
+import ClassroomEtudiant from "../models/ClassroomEtudiant";
 
 export const addHomework = async (req: Request, res: Response) => {
   try {
@@ -32,54 +33,71 @@ export const updateHomework = async (req: Request, res: Response) => {
 };
 
 export const deleteHomework = async (req: Request, res: Response) => {
-  const { id } = req.params;
   try {
-    const deletedHomework = await Homework.findByIdAndDelete(id);
+    const deletedHomework = await Homework.findByIdAndDelete(req.params.id);
     if (!deletedHomework)
       return res.status(404).json({ message: "Homework not found" });
     res.status(200).json({ message: "Homework deleted successfully" });
   } catch (error) {
-    res.status(500).json({ message: "Error deleting homework", error });
+    res.status(400).json({ error: "Error deleting homework" });
   }
 };
 // // Récupérer un devoir par l'ID du parent
-// export const getAllHomeworksParentId = async (req: Request, res: Response) => {
-//   try {
-//     const parentId = req.params.classroom_id; // On suppose que l'ID du parent est passé dans les paramètres de la requête
+export const getAllHomeworksParentId = async (req: Request, res: Response) => {
+  try {
+    const parentId = req.params.parentId; // Récupérer l'ID du parent à partir des paramètres de la requête
 
-//     // Vérifier si l'ID passé est un ObjectId valide
-//     if (!mongoose.Types.ObjectId.isValid(parentId)) {
-//       return res.status(400).json({ message: "ID du parent invalide." });
-//     }
+    // Vérifier si l'ID passé est un ObjectId valide
+    if (!mongoose.Types.ObjectId.isValid(parentId)) {
+      return res.status(400).json({ message: "ID du parent invalide." });
+    }
 
-//     const parentObjectId = new mongoose.Types.ObjectId(parentId);
+    const parentObjectId = new mongoose.Types.ObjectId(parentId);
 
-//     // Récupérer tous les étudiants associés au parent
-//     const students = await User.find({ parent: parentObjectId, role: "etudiant" });
+    // Récupérer tous les étudiants associés au parent
+    const students = await User.find({ parent: parentObjectId, role: "etudiant" });
 
-//     if (students.length === 0) {
-//       return res.status(404).json({ message: "Aucun étudiant trouvé pour ce parent.", parentId });
-//     }
+    if (students.length === 0) {
+      return res.status(404).json({ message: "Aucun étudiant trouvé pour ce parent.", parentId });
+    }
 
-//     // Récupérer les IDs des étudiants (enfants)
-//     const studentIds = students.map(student => student._id);
+    // Récupérer les IDs des étudiants (enfants)
+    const studentIds = students.map((student) => student._id);
 
-//     // Récupérer les devoirs associés aux étudiants
-//     const homeworks = await Homework.find({ student_id: { $in: studentIds } })
-//       .populate('course_id') // Peupler les informations sur le cours
-//       .populate('Classroom_id'); // Peupler les informations sur la classe
+    // Récupérer les classes associées à ces étudiants depuis classroom_etudiant
+    const classroomEtudiantEntries = await ClassroomEtudiant.find({ student_id: { $in: studentIds } });
 
-//     if (homeworks.length === 0) {
-//       return res.status(404).json({ message: "Aucun devoir trouvé pour les étudiants de ce parent.", parentId });
-//     }
+    if (classroomEtudiantEntries.length === 0) {
+      return res.status(404).json({ message: "Aucune classe trouvée pour ces étudiants.", parentId });
+    }
 
-//     // Retourner la liste des devoirs
-//     res.status(200).json(homeworks);
-//   } catch (error) {
-//     console.error(error); // Pour mieux diagnostiquer l'erreur
-//     res.status(500).json({ message: "Erreur serveur." });
-//   }
-// };
+    // Récupérer les IDs des classes des enfants
+    const classroomIds = classroomEtudiantEntries.map((entry) => entry.classroom_id);
+
+    // Récupérer les devoirs associés aux classes des étudiants
+    const homeworks = await Homework.find({ classroom_id: { $in: classroomIds } })
+      .populate({
+        path: "course_id",
+        populate: {
+          path: "id_user", // Peupler les informations du professeur
+          select: "firstname lastname", // Sélectionner uniquement les champs nécessaires (nom et prénom du professeur)
+        },
+      })
+      .populate('classroom_id'); // Peupler les informations sur la classe
+
+    if (homeworks.length === 0) {
+      return res.status(404).json({ message: "Aucun devoir trouvé pour ces classes.", parentId });
+    }
+
+    // Retourner la liste des devoirs
+    res.status(200).json(homeworks);
+  } catch (error) {
+    console.error("Erreur serveur:", error); // Pour mieux diagnostiquer l'erreur
+    res.status(500).json({ message: "Erreur serveur." });
+  }
+};
+
+
 // Récupérer un devoir par son ID
 export const getHomeworkById = async (req: Request, res: Response) => {
   try {
