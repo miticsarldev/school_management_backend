@@ -1,5 +1,7 @@
 import { Request, Response } from "express";
 import Exam from "../models/Exam";
+import mongoose from "mongoose";
+import User from "../models/User";
 
 export const addExam = async (req: Request, res: Response) => {
   try {
@@ -68,5 +70,36 @@ export const getExamById = async (req: Request, res: Response) => {
     res
       .status(500)
       .json({ message: "Erreur lors de la récupération de l'examen", error });
+  }
+};
+export const getAllExamsParentId = async (req: Request, res: Response) => {
+  try {
+    const parentId = req.params.student_id; // On suppose que l'ID du parent est passé dans les paramètres de la requête
+    
+    // Convertir parentId en ObjectId si nécessaire
+    const parentObjectId = new mongoose.Types.ObjectId(parentId);
+
+    // Récupérer tous les enfants associés au parent
+    const students = await User.find({ parent: parentObjectId, role: "etudiant" });
+
+    if (students.length === 0) {
+      return res.status(404).json({ message: "Aucun étudiant trouvé pour ce parent.", parentId });
+    }
+
+    // Récupérer les IDs des étudiants (enfants)
+    const studentIds = students.map(student => student._id);
+
+    // Récupérer les événements associés aux étudiants
+    const exams = await Exam.find({ student_id: { $in: studentIds } });
+
+    if (exams.length === 0) {
+      return res.status(404).json({ message: "Aucun événement trouvé pour les étudiants de ce parent.", parentId });
+    }
+
+    // Retourner la liste des événements
+    res.status(200).json(exams);
+  } catch (error) {
+    console.error(error); // Pour mieux diagnostiquer l'erreur
+    res.status(500).json({ message: "Erreur serveur." });
   }
 };

@@ -2,14 +2,20 @@ import { Schema, model} from 'mongoose';
 import { IHomework } from '../types/model.homework.type';
 
 const homeworkSchema = new Schema<IHomework>({
-  classe_id: {
+  classroom_id: {
     type: Schema.Types.ObjectId,
+    ref: "Classroom",
     required: true 
     },
-  cours_id: {
+  course_id: {
     type: Schema.Types.ObjectId,
+    ref: "Course",
     required: true 
     },
+  name: {
+      type: String, 
+      required: true 
+      },
   homework_date: {
     type: Date, 
     required: true 
@@ -24,4 +30,4 @@ const homeworkSchema = new Schema<IHomework>({
     },
 });
 
-export const HomeworkModel = model<IHomework>('Homework', homeworkSchema);
+export const Homework = model<IHomework>('Homework', homeworkSchema);

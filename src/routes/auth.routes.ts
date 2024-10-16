@@ -30,10 +30,11 @@ router.post("/logout", logout);
 // Get all users
 router.get("/users", getUsers);
 
-router.get("/students-by-parent/:id", getAllUsersStudentByParentId);
+router.get("/students-by-parent/:parent", getAllUsersStudentByParentId);
 // Update user
 router.patch("/users/:id", validateUser, upload, updateUser);
-
+// Route pour mettre à jour un utilisateur par ID
+router.put('/users/:id', updateUser);
 // Delete user
 router.delete("/users/:id", deleteUser);
 

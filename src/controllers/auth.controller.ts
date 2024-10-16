@@ -4,6 +4,7 @@ import User from "../models/User";
 import { generateAccessToken, generateRefreshToken } from "../utils";
 import path from "path";
 import fs from "fs";
+import mongoose from "mongoose";
 
 export const register = async (req: Request, res: Response) => {
   try {
@@ -25,6 +26,7 @@ export const register = async (req: Request, res: Response) => {
       website,
       role,
       status,
+      parent,
     } = req.body;
 
     const image = req.file ? `/uploads/${req.file.filename}` : "";
@@ -57,9 +59,18 @@ export const register = async (req: Request, res: Response) => {
       role,
       status,
       image: imageUrl,
+      parent: parent, // Assigner le parent
     });
 
     await user.save();
+    // Si c'est un étudiant, je l'ajoute à la liste des enfants du parent
+    if (role === "etudiant" && parent) {
+      const parentId = await User.findById(parent);
+      if (parentId) {
+        parentId.children.push(user._id); // Ajout de l'ID de l'étudiant aux enfants du parentId
+        await parentId.save();
+      }
+    }
     res.status(201).json({ message: "Utilisateur creé avec succès" });
   } catch (error) {
     res.status(500).json({ message: "Server error" });
@@ -68,13 +79,18 @@ export const register = async (req: Request, res: Response) => {
 // Récupérer tous les utilisateurs de rôle "etudiant" liés à un parent spécifique
 export const getAllUsersStudentByParentId = async (req: Request, res: Response) => {
   try {
-    const parentId = req.params.parentId; // On suppose que l'ID du parent est passé dans les paramètres de la requête
-    const students = await User.find({ role: "etudiant", parent: parentId });
+    const parentId = req.params.parent; // On suppose que l'ID du parent est passé dans les paramètres de la requête
+    
+    // Convertir parentId en ObjectId si nécessaire
+    const parentObjectId = new mongoose.Types.ObjectId(req.params.parent);
+
+    const students = await User.find({ role: "etudiant", parent: parentObjectId });
     if (students.length === 0) {
-      return res.status(404).json({ message: "Aucun étudiant trouvé pour ce parent." });
+      return res.status(404).json({ message: "Aucun étudiant trouvé pour ce parent."  ,parentObjectId});
     }
     res.status(200).json(students);
   } catch (error) {
+    console.error(error); // Pour mieux diagnostiquer l'erreur
     res.status(500).json({ message: "Erreur serveur." });
   }
 };
@@ -122,7 +138,7 @@ export const getUsers = async (req: Request, res: Response) => {
 // For updating, we will use all fields beside (username, email and phonenumber)
 export const updateUser = async (req: Request, res: Response) => {
   try {
-    const { id } = req.params;
+    const { id } = req.params; // Récupérer l'ID de l'utilisateur depuis les paramètres de la requête
     const {
       firstname,
       lastname,
@@ -137,17 +153,20 @@ export const updateUser = async (req: Request, res: Response) => {
       website,
       role,
       status,
+      parent, // ID du parent à éventuellement mettre à jour
     } = req.body;
 
+    // Traiter l'image si elle est présente
     const image = req.file ? `/uploads/${req.file.filename}` : "";
 
+    // Rechercher l'utilisateur à mettre à jour
     const user = await User.findById(id);
     if (!user) {
-      return res.status(404).json({ message: "User not found" });
+      return res.status(404).json({ message: "Utilisateur non trouvé" });
     }
 
-    // Delete the previous image if it exists and replace it with the new one for the user
-    if (user.image) {
+    // Suppression de l'image précédente si une nouvelle image est fournie
+    if (req.file && user.image) {
       const imagePath = path.join(
         __dirname,
         "..",
@@ -156,12 +175,17 @@ export const updateUser = async (req: Request, res: Response) => {
       );
 
       if (fs.existsSync(imagePath)) {
-        fs.unlinkSync(imagePath);
+        fs.unlinkSync(imagePath); // Supprimer l'ancienne image du serveur
       }
     }
 
-    const imageUrl = `${req.protocol}://${req.get("host")}${image}`;
+    // Mettre à jour uniquement si une nouvelle image est fournie
+    if (req.file) {
+      const imageUrl = `${req.protocol}://${req.get("host")}${image}`;
+      user.image = imageUrl; // Met à jour l'URL de l'image de l'utilisateur
+    }
 
+    // Mettre à jour les informations de l'utilisateur
     user.firstname = firstname;
     user.lastname = lastname;
     user.bio = bio;
@@ -172,15 +196,49 @@ export const updateUser = async (req: Request, res: Response) => {
     user.quarter = quarter;
     user.street = street;
     user.door = door;
-    user.image = imageUrl;
     user.website = website;
     user.role = role;
     user.status = status;
 
+    // Vérifier si l'utilisateur est un étudiant et qu'un parent est fourni
+    if (parent && role === "etudiant") {
+      const previousParentId = user.parent; // ID du parent précédent
+
+      // Vérifier que le nouveau parent est valide et qu'il a le rôle "parent"
+      const newParent = await User.findById(parent);
+      if (!newParent || newParent.role !== 'parent') {
+        return res.status(400).json({ message: "ID de parent invalide ou rôle incorrect." });
+      }
+
+      // Ajouter l'ID de l'étudiant dans la liste des enfants du nouveau parent
+      newParent.children.push(user._id);
+      await newParent.save(); // Sauvegarder le nouveau parent
+
+      // Si l'utilisateur avait un parent précédent, le retirer de la liste des enfants
+      if (previousParentId && previousParentId.toString() !== parent) {
+        await User.updateOne(
+          { _id: previousParentId },
+          { $pull: { children: user._id } } // Supprimer l'étudiant de l'ancien parent
+        );
+      }
+
+      // Mettre à jour l'ID du parent dans l'utilisateur
+      user.parent = parent;
+    }
+
+    // Sauvegarder les modifications de l'utilisateur
     await user.save();
-    res.json(user);
+
+    res.json(user); // Répondre avec les informations mises à jour de l'utilisateur
   } catch (error) {
-    res.status(500).json({ message: "Server error" });
+    console.error('Erreur lors de la mise à jour de l\'utilisateur :', error);
+    
+    // Gérer les erreurs et renvoyer une réponse appropriée
+    if (error instanceof Error) {
+      res.status(500).json({ message: "Erreur serveur pendant la mise à jour.", error: error.message });
+    } else {
+      res.status(500).json({ message: "Erreur serveur pendant la mise à jour." });
+    }
   }
 };
 
