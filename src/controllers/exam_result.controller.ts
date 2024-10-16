@@ -2,6 +2,8 @@ import { Request, Response } from "express";
 import ExamResult from "../models/ExamResult";
 import mongoose from "mongoose";
 import User from "../models/User";
+import ClassroomEtudiant from "../models/ClassroomEtudiant"; // Assurez-vous de mettre le bon chemin d'importation
+import Course from "../models/Course";
 
 // Créer un nouveau résultat d'examen
 export const createExamResult = async (req: Request, res: Response) => {
@@ -129,5 +131,48 @@ export const deleteExamResult = async (req: Request, res: Response) => {
     res.status(200).json({ message: "Exam result deleted successfully" });
   } catch (error) {
     res.status(500).json({ message: "Error deleting exam result", error });
+  }
+};
+
+export const getClassRoomResult = async (req: Request, res: Response) => {
+  const { classId } = req.params; // Récupérer l'ID de la classe depuis les paramètres de la requête
+
+  try {
+    // Récupérer tous les enregistrements ClassroomEtudiant correspondant à la classe
+    const classroomEtudiants = await ClassroomEtudiant.find({ classroom_id: classId });
+
+    if (!classroomEtudiants.length) {
+      return res.status(404).json({ error: 'Aucun étudiant trouvé pour cette classe.' });
+    }
+
+    console.log(classroomEtudiants);
+    
+
+    // Extraire tous les IDs des étudiants de la classe
+    const studentIds = classroomEtudiants.map((ce) => ce.student_id);
+
+    // Récupérer les cours associés à cette classe via l'ID du ClassroomEtudiant (id_classroom_etudiant)
+    const courses = await Course.find({ id_classroom_etudiant: { $in: classroomEtudiants.map(ce => ce._id) } });
+
+    console.log(courses);
+    
+
+    if (!courses.length) {
+      return res.status(404).json({ error: 'Aucun cours trouvé pour cette classe.' });
+    }
+
+    const courseIds = courses.map((course) => course._id);
+
+    // Récupérer les résultats d'examen pour les cours de cette classe et peupler les informations sur les étudiants et les cours
+    const examResults = await ExamResult.find({ course_id: { $in: courseIds }, student_id: { $in: studentIds } })
+      .populate('student_id', 'firstname') // Peupler le champ 'firstname' du modèle 'User'
+      .populate('course_id', 'name'); // Peupler le champ 'name' du modèle 'Course'
+
+      console.log(examResults);
+      
+
+    res.json(examResults);
+  } catch (err) {
+    res.status(500).json({ error: 'Échec de la récupération des résultats d\'examen.' });
   }
 };

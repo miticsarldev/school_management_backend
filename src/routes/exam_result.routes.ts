@@ -5,7 +5,8 @@ import {
     getExamResultById,
     updateExamResult,
     deleteExamResult,
-    getAllExam_resultsParentId
+    getAllExam_resultsParentId,
+    getClassRoomResult
 } from '../controllers/exam_result.controller';
 
 const router = Router();
@@ -21,6 +22,8 @@ router.get('/exam-results/:id', getExamResultById);
 
 // Route pour lister tous les événements par parent
 router.get("/exam_results-by-user/:student_id", getAllExam_resultsParentId);
+
+router.get("/exam_results-by-class/:classId", getClassRoomResult);
 // Route pour mettre à jour un résultat d'examen
 router.put('/exam-results/:id', updateExamResult);
 
