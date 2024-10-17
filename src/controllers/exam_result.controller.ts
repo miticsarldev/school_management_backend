@@ -42,7 +42,28 @@ export const getAllExamResults = async (req: Request, res: Response) => {
     });
   }
 };
+export const getTopStudents = async (req: Request, res: Response) => {
+  try {
+    const topStudents = await ExamResult.find()
+      .populate("student_id", "firstname lastname image") // Récupérer les informations de l'étudiant
+      .populate({
+        path: "course_id",
+        populate: {
+          path: "id_classroom_etudiant", // Assurez-vous que c'est bien la bonne référence
+          populate: {
+            path: "classroom_id", // Récupérer les informations de la classe via classroom_id
+            select: "name", // Sélectionner uniquement le champ name de la classe
+          },
+        },
+      })
+      .sort({ grade: -1 }) // Trier par les notes décroissantes
+      .limit(3); // Limiter à 3 résultats
 
+    res.status(200).json(topStudents);
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching top students", error });
+  }
+};
 // Obtenir un résultat d'examen par ID
 export const getExamResultById = async (req: Request, res: Response) => {
   try {

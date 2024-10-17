@@ -4,7 +4,7 @@ import Course from "../models/Course";
 // Créer un nouveau cours
 export const createCourse = async (req: Request, res: Response) => {
     try {
-      const { name, number_of_hours, description, id_user, id_grade, id_classroom, statuses } = req.body;
+      const { name, number_of_hours, description, id_user, id_grade, id_classroom_etudiant, statuses } = req.body;
   
       const courseExists = await Course.findOne({ name });
       if (courseExists) {
@@ -17,7 +17,7 @@ export const createCourse = async (req: Request, res: Response) => {
         description,
         id_user,
         id_grade,
-        id_classroom,
+        id_classroom_etudiant,
         statuses,
       });
   
@@ -48,7 +48,7 @@ export const getCourses = async (req: Request, res: Response) => {
 export const updateCourse = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const { name, number_of_hours, description, id_user, id_grade, id_classroom, statuses } = req.body;
+    const { name, number_of_hours, description, id_user, id_grade, id_classroom_etudiant, statuses } = req.body;
 
     // Vérifiez si un autre cours avec le même nom existe déjà
     const existingCourse = await Course.findOne({ name });
@@ -68,7 +68,7 @@ export const updateCourse = async (req: Request, res: Response) => {
     course.description = description;
     course.id_user = id_user;
     course.id_grade = id_grade;
-    course.id_classroom = id_classroom;
+    course.id_classroom_etudiant = id_classroom_etudiant;
     course.statuses = statuses;
 
     await course.save();

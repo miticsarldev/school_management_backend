@@ -7,6 +7,6 @@ export interface ICourse extends Document {
   description: string;
   id_user: Schema.Types.ObjectId;
   id_grade: Schema.Types.ObjectId;
-  id_classroom: Schema.Types.ObjectId;
+  id_classroom_etudiant: Schema.Types.ObjectId;
   statuses: boolean;
 }

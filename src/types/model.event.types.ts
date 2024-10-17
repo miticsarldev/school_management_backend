@@ -11,6 +11,7 @@ export interface IEvent extends Document {
   status: boolean;
   start_hour: Date;
   end_hour: Date;
+  borderColor:string;
   student_id: Schema.Types.ObjectId; // Référence à l'étudiant
   timetable_id: Schema.Types.ObjectId; // Référence à l'emploi du temps
 }

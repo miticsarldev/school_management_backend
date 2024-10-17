@@ -1,10 +1,11 @@
 import { Router } from 'express';
 import {
+    getTopStudents,
     createExamResult,
     getAllExamResults,
     getExamResultById,
     updateExamResult,
-    deleteExamResult
+    deleteExamResult,
 } from '../controllers/exam_result.controller';
 
 const router = Router();
@@ -17,6 +18,9 @@ router.get('/exam-results', getAllExamResults);
 
 // Route pour obtenir un résultat d'examen par ID
 router.get('/exam-results/:id', getExamResultById);
+
+// Nouveau route pour récupérer les trois meilleurs étudiants
+router.get("/top-students", getTopStudents);
 
 // Route pour mettre à jour un résultat d'examen
 router.put('/exam-results/:id', updateExamResult);
