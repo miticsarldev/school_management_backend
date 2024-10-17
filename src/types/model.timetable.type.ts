@@ -6,6 +6,6 @@ export interface ITimetable extends Document {
     id_users: Schema.Types.ObjectId;
     classroom_id: Schema.Types.ObjectId;
     day: Date;  
-    start_time: string;
-    end_time: string;  
+    start_time: Date;
+    end_time: Date;  
 }

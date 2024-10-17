@@ -18,11 +18,15 @@ export const addTimetable = async (req: Request, res: Response) => {
 
 export const getTimetables = async (req: Request, res: Response) => {
   try {
+<<<<<<< HEAD
+    const timetables = await Timetable.find().populate("cours_id").populate("id_users").populate("classroom_id");
+=======
     const timetables = await Timetable.find()
       .populate("cours_id", "name") 
       .populate("id_users", "name email")  
       .populate("classroom_id", "name"); // Champs de la salle de classe
 
+>>>>>>> caebbd06622884fb01b839b601c2ba3597819b72
     res.status(200).json(timetables);
   } catch (error) {
     res.status(500).json({

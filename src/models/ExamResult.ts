@@ -20,7 +20,7 @@ const ExamResultSchema = new Schema<IExam_Result>(
       required: true,
     },
     grade: {
-      type: String,
+      type: Number,
       required: true,
     },
     comments: {

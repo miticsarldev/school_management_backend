@@ -18,7 +18,7 @@ const attendanceSchema = new Schema<IAttendance>(
     timetable_id: {
       type: Schema.Types.ObjectId,
       ref: 'Timetable', // Référence au modèle TimeTable pour le cours
-      required: true,
+      required: false,
     },
     status: {
       type: Boolean,
