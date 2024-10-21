@@ -37,9 +37,14 @@ export const createCourse = async (req: Request, res: Response) => {
 // afficher tous les cours
 export const getCourses = async (req: Request, res: Response) => {
   try {
-    const courses = await Course.find();
+    const courses = await Course.find()
+      .populate('id_user') // Pour obtenir les détails de l'étudiant
+      .populate('id_grade') // Pour obtenir les détails de la note
+      .populate('id_classroom_etudiant') // Pour obtenir les détails de la classe de l'étudiant
+      .exec(); // exécute la requête
     res.json(courses);
   } catch (error) {
+    console.error("Erreur lors de la récupération des cours :", error); // Log l'erreur
     res.status(500).json({ message: "Erreur de serveur" });
   }
 };
@@ -48,7 +53,7 @@ export const getCourses = async (req: Request, res: Response) => {
 export const updateCourse = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const { name, number_of_hours, description, id_user, id_grade, id_classroom_etudiant, statuses } = req.body;
+    const { name, number_of_hours, description, id_user, id_grade, id_classroom_etudiant,id_classroom_teacher, statuses } = req.body;
 
     // Vérifiez si un autre cours avec le même nom existe déjà
     const existingCourse = await Course.findOne({ name });

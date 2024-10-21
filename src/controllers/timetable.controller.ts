@@ -1,5 +1,7 @@
 import { Request, Response } from "express";
 import Timetable from "../models/Timetable";
+import mongoose from "mongoose";
+import User from "../models/User";
 
 // Ajouter un emploi du temps
 export const addTimetable = async (req: Request, res: Response) => {
@@ -71,16 +73,17 @@ export const deleteTimetable = async (req: Request, res: Response) => {
       });
   }
 };
-// Récupérer un emploi du temps par ID
 export const getTimetableById = async (req: Request, res: Response) => {
   try {
     const timetableId = req.params.id;
-    
-    // Rechercher l'emploi du temps par ID et peupler les références
-    const timetable = await Timetable.findById(timetableId)
-      .populate("cours_id", "name") // Remplacez 'course_name' par les champs nécessaires
-      .populate("id_users", "name email") // Remplacez 'name', 'email' par les champs nécessaires
-      .populate("classroom_id", "name"); // Champs de la salle de classe
+    if (!mongoose.Types.ObjectId.isValid(timetableId)) {
+      return res.status(400).json({ message: "ID invalide" });
+    }
+
+    const timetable = await Timetable.findById("67105aba680af382564e8d2c")
+      .populate("cours_id", "name")
+      .populate("id_users", "name email")
+      .populate("classroom_id", "name");
 
     if (!timetable) {
       return res.status(404).json({ message: "Emploi du temps non trouvé" });
@@ -88,6 +91,44 @@ export const getTimetableById = async (req: Request, res: Response) => {
 
     res.status(200).json(timetable);
   } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      message: "Erreur lors de la récupération de l'emploi du temps",
+      error,
+    });
+  }
+};
+
+export const getTimetableByUserId = async (req: Request, res: Response) => {
+  try {
+    const userId = req.params.user_id;
+    if (!mongoose.Types.ObjectId.isValid(userId)) {
+      return res.status(400).json({ message: "user_id invalide" });
+    }
+
+    const userObjectId = new mongoose.Types.ObjectId(userId);
+    const user = await User.findById(userObjectId);
+    
+    if (!user) {
+      return res.status(404).json({ message: "Utilisateur non trouvé", userId });
+    }
+
+    if (user.role === 'enseignant') { // Utilisez '===' pour comparaison
+      const timetableTeacher = await Timetable.find({ id_users: userObjectId })
+        .populate("cours_id", "name")
+        .populate("id_users", "name email")
+        .populate("classroom_id", "name");
+
+      if (!timetableTeacher) {
+        return res.status(404).json({ message: "Emploi du temps non trouvé" });
+      }
+
+      res.status(200).json(timetableTeacher);
+    } else {
+      return res.status(400).json({ message: "Cet utilisateur n'est pas un enseignant" });
+    }
+  } catch (error) {
+    console.error(error);
     res.status(500).json({
       message: "Erreur lors de la récupération de l'emploi du temps",
       error,
