@@ -5,6 +5,7 @@ import mongoose from "mongoose";
 import ExamResult from "../models/ExamResult";
 import User from "../models/User";
 import ClassroomEtudiant from "../models/ClassroomEtudiant";
+// // Récupérer un devoir par l'ID du parent
 
 export const addHomework = async (req: Request, res: Response) => {
   try {
@@ -42,60 +43,107 @@ export const deleteHomework = async (req: Request, res: Response) => {
     res.status(400).json({ error: "Error deleting homework" });
   }
 };
-// // Récupérer un devoir par l'ID du parent
-export const getAllHomeworksParentId = async (req: Request, res: Response) => {
+
+export const getHomeworksByUserId = async (req: Request, res: Response) => {
   try {
-    const parentId = req.params.parentId; // Récupérer l'ID du parent à partir des paramètres de la requête
+    const userId = req.params.userId; // Récupérer l'ID de l'utilisateur à partir des paramètres de la requête
 
     // Vérifier si l'ID passé est un ObjectId valide
-    if (!mongoose.Types.ObjectId.isValid(parentId)) {
-      return res.status(400).json({ message: "ID du parent invalide." });
+    if (!mongoose.Types.ObjectId.isValid(userId)) {
+      return res.status(400).json({ message: "ID utilisateur invalide." });
     }
 
-    const parentObjectId = new mongoose.Types.ObjectId(parentId);
+    const userObjectId = new mongoose.Types.ObjectId(userId);
 
-    // Récupérer tous les étudiants associés au parent
-    const students = await User.find({ parent: parentObjectId, role: "etudiant" });
-
-    if (students.length === 0) {
-      return res.status(404).json({ message: "Aucun étudiant trouvé pour ce parent.", parentId });
+    // Récupérer les informations de l'utilisateur
+    const user = await User.findById(userObjectId);
+    if (!user) {
+      return res.status(404).json({ message: "Utilisateur non trouvé.", userId });
     }
 
-    // Récupérer les IDs des étudiants (enfants)
-    const studentIds = students.map((student) => student._id);
+    // Vérifier le rôle de l'utilisateur
+    switch (user.role) {
+      case 'parent':
+        // Logique pour récupérer les devoirs pour un parent
+        const students = await User.find({ parent: userObjectId, role: "etudiant" });
+        if (students.length === 0) {
+          return res.status(404).json({ message: "Aucun étudiant trouvé pour ce parent.", userId });
+        }
 
-    // Récupérer les classes associées à ces étudiants depuis classroom_etudiant
-    const classroomEtudiantEntries = await ClassroomEtudiant.find({ student_id: { $in: studentIds } });
+        const studentIds = students.map((student) => student._id);
+        const classroomEtudiantEntries = await ClassroomEtudiant.find({ student_id: { $in: studentIds } });
+        if (classroomEtudiantEntries.length === 0) {
+          return res.status(404).json({ message: "Aucune classe trouvée pour ces étudiants.", userId });
+        }
 
-    if (classroomEtudiantEntries.length === 0) {
-      return res.status(404).json({ message: "Aucune classe trouvée pour ces étudiants.", parentId });
+        const classroomIds = classroomEtudiantEntries.map((entry) => entry.classroom_id);
+        const homeworks = await Homework.find({ classroom_id: { $in: classroomIds } })
+          .populate({
+            path: "course_id",
+            populate: {
+              path: "id_user",
+              select: "firstname lastname",
+            },
+          })
+          .populate('classroom_id');
+
+        if (homeworks.length === 0) {
+          return res.status(404).json({ message: "Aucun devoir trouvé pour ces classes.", userId });
+        }
+
+        return res.status(200).json(homeworks);
+
+      case 'enseignant':
+        // Logique pour récupérer les devoirs pour un enseignant
+        const teacherHomeworks = await Homework.find({ id_user: userObjectId }) // Supposant que vous avez un champ `id_user` dans Homework
+          .populate('classroom_id'); // Peupler les informations sur la classe
+
+        if (teacherHomeworks.length === 0) {
+          return res.status(404).json({ message: "Aucun devoir trouvé pour cet enseignant.", userId });
+        }
+
+        return res.status(200).json(teacherHomeworks);
+
+        case 'etudiant':
+          // Logique pour récupérer les devoirs pour un étudiant
+          const classroomEtudiantEntrie = await ClassroomEtudiant.findOne({ student_id: userObjectId });
+          if (!classroomEtudiantEntrie) { // Vérifie si l'entrée de la classe existe
+            return res.status(404).json({ message: "Aucune classe trouvée pour cet étudiant.", userId });
+          }
+        
+          const studentHomeworks = await Homework.find({ classroom_id: classroomEtudiantEntrie.classroom_id })
+            .populate({
+              path: "course_id",
+              populate: {
+                path: "id_user",
+                select: "firstname lastname",
+              },
+            })
+            .populate('classroom_id');
+        
+          if (studentHomeworks.length === 0) {
+            return res.status(404).json({ message: "Aucun devoir trouvé pour cet étudiant.", userId });
+          }
+        
+          return res.status(200).json(studentHomeworks);
+        
+
+      case 'administrateur':
+        // Logique pour récupérer tous les devoirs pour un administrateur
+        const allHomeworks = await Homework.find()
+          .populate('classroom_id');
+
+        return res.status(200).json(allHomeworks);
+
+      default:
+        return res.status(403).json({ message: "Rôle non reconnu." });
     }
-
-    // Récupérer les IDs des classes des enfants
-    const classroomIds = classroomEtudiantEntries.map((entry) => entry.classroom_id);
-
-    // Récupérer les devoirs associés aux classes des étudiants
-    const homeworks = await Homework.find({ classroom_id: { $in: classroomIds } })
-      .populate({
-        path: "course_id",
-        populate: {
-          path: "id_user", // Peupler les informations du professeur
-          select: "firstname lastname", // Sélectionner uniquement les champs nécessaires (nom et prénom du professeur)
-        },
-      })
-      .populate('classroom_id'); // Peupler les informations sur la classe
-
-    if (homeworks.length === 0) {
-      return res.status(404).json({ message: "Aucun devoir trouvé pour ces classes.", parentId });
-    }
-
-    // Retourner la liste des devoirs
-    res.status(200).json(homeworks);
   } catch (error) {
-    console.error("Erreur serveur:", error); // Pour mieux diagnostiquer l'erreur
+    console.error("Erreur serveur:", error);
     res.status(500).json({ message: "Erreur serveur." });
   }
 };
+
 
 
 // Récupérer un devoir par son ID

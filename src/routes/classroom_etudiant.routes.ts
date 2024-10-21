@@ -4,7 +4,8 @@ import {
   deleteClassroomEtudiant,
   getClassroomEtudiants,
   getClassroomEtudiantById,
-  updateClassroomEtudiant
+  updateClassroomEtudiant,
+  getClassroomEtudiantByStudentId
 } from "../controllers/classroom_etudiant.controller";
 
 const router = Router();
@@ -17,7 +18,8 @@ router.get("/classroom_etudiants", getClassroomEtudiants);
 
 // Afficher une classroomEtudiant par ID
 router.get("/classroom_etudiants/:id", getClassroomEtudiantById);
-
+// Afficher une classroomEtudiant par ID
+router.get("/classroom_etudiants_by_studentId/:student_id", getClassroomEtudiantByStudentId);
 // Modifier une classroomEtudiant
 router.put("/classroom_etudiants/:id", updateClassroomEtudiant);
 

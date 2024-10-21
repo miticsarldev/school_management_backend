@@ -3,6 +3,7 @@ import Attendance from "../models/Attendance"; // Importation du modèle Attenda
 import { createObjectCsvWriter } from "csv-writer"; // Importation de la fonction pour écrire des fichiers CSV
 import User from "../models/User";
 import mongoose from "mongoose";
+import ClassroomEtudiant from "../models/ClassroomEtudiant";
 
 // Contrôleur pour enregistrer une nouvelle présence
 export const createAttendance = async (req: Request, res: Response) => {
@@ -167,6 +168,90 @@ export const getAllAttendances = async (req: Request, res: Response) => {
     }); // Gestion des erreurs
   }
 };
+// Contrôleur pour récupérer les présences d'un utilisateur spécifique par role
+export const getAttendancesByUserId = async (req: Request, res: Response) => {
+  try {
+    const userId = req.params.user_id; // Récupérer l'ID de l'utilisateur à partir des paramètres de la requête
+
+    // Vérifier si l'ID passé est un ObjectId valide
+    if (!mongoose.Types.ObjectId.isValid(userId)) {
+      return res.status(400).json({ message: "ID utilisateur invalide." });
+    }
+
+    const userObjectId = new mongoose.Types.ObjectId(userId);
+
+    // Récupérer les informations de l'utilisateur
+    const user = await User.findById(userObjectId);
+    if (!user) {
+      return res.status(404).json({ message: "Utilisateur non trouvé.", userId });
+    }
+
+    // Vérifier le rôle de l'utilisateur
+    switch (user.role) {
+      case 'parent':
+        // Logique pour récupérer les présences pour un parent
+        const students = await User.find({ parent: userObjectId, role: "etudiant" });
+        if (students.length === 0) {
+          return res.status(404).json({ message: "Aucun étudiant trouvé pour ce parent.", userId });
+        }
+
+        const studentIds = students.map((student) => student._id);
+
+        const attendances = await Attendance.find({ student_id: { $in: studentIds } })
+          .populate("teacher_id")
+          .populate("student_id")
+          .populate('timetable_id');
+
+        if (attendances.length === 0) {
+          return res.status(404).json({ message: "Aucune présence trouvée pour ces classes.", userId });
+        }
+
+        return res.status(200).json(attendances);
+
+      case 'enseignant':
+        // Logique pour récupérer les présences pour un enseignant
+        const teacherAttendances = await Attendance.find({ teacher_id: userObjectId })
+        .populate("teacher_id")
+        .populate("student_id")
+        .populate('timetable_id');
+
+        if (teacherAttendances.length === 0) {
+          return res.status(404).json({ message: "Aucune présence trouvée pour cet enseignant.", userObjectId });
+        }
+
+        return res.status(200).json(teacherAttendances);
+
+        case 'etudiant':
+          // Logique pour récupérer les présences pour un étudiant
+          const studentAttendances = await Attendance.find({ student_id: userObjectId })
+          .populate("teacher_id")
+          .populate("student_id")
+          .populate('timetable_id');
+        
+          if (studentAttendances.length === 0) {
+            return res.status(404).json({ message: "Aucune présence trouvée pour cet étudiant.", userObjectId });
+          }
+        
+          return res.status(200).json(studentAttendances);
+        
+
+      case 'administrateur':
+        // Logique pour récupérer tous les présences pour un administrateur
+        const allAttendances = await Attendance.find()
+        .populate("teacher_id")
+        .populate("student_id")
+        .populate('timetable_id');
+
+        return res.status(200).json(allAttendances);
+
+      default:
+        return res.status(403).json({ message: "Rôle non reconnu." });
+    }
+  } catch (error) {
+    console.error("Erreur serveur:", error);
+    res.status(500).json({ message: "Erreur serveur." });
+  }
+};
 // Contrôleur pour récupérer les présences d'un utilisateur spécifique
 export const getAttendanceByUser = async (req: Request, res: Response) => {
   const { user_id } = req.params; // Récupération de l'identifiant de l'utilisateur à partir des paramètres
@@ -255,26 +340,6 @@ export const getAttendanceStats = async (req: Request, res: Response) => {
   } catch (error) {
     res.status(500).json({
       message: "Erreur lors de la récupération des statistiques de présence",
-      error,
-    }); // Gestion des erreurs
-  }
-};
-
-// Contrôleur pour récupérer toutes les présences avec informations des clés étrangères
-export const getAllAttendances = async (req: Request, res: Response) => {
-  try {
-    // Récupérer toutes les présences et peupler les informations des utilisateurs et de l'emploi du temps
-    const attendances = await Attendance.find()
-      .populate('student_id', 'firstname lastname') // Peupler avec les champs firstname et lastname de l'utilisateur étudiant
-      .populate('teacher_id', 'firstname lastname') // Peupler avec les champs firstname et lastname de l'utilisateur enseignant
-      .populate('timetable_id'); // Peupler toutes les informations de l'emploi du temps
-
-    console.log("Présences récupérées:", attendances);
-    res.json(attendances); // Réponse avec la liste des présences peuplées
-  } catch (error) {
-    console.error("Erreur dans getAllAttendances:", error);
-    res.status(500).json({
-      message: "Erreur lors de la récupération de toutes les présences",
       error,
     }); // Gestion des erreurs
   }

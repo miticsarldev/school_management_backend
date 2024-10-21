@@ -28,6 +28,9 @@ const homeworkSchema = new Schema<IHomework>({
     type: Boolean,
     default: false 
     },
+},
+{
+  timestamps: true,
 });
 
 export const Homework = model<IHomework>('Homework', homeworkSchema);

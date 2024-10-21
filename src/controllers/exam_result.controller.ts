@@ -101,7 +101,27 @@ export const getAllExam_resultsParentId = async (req: Request, res: Response) =>
     res.status(500).json({ message: "Erreur serveur." });
   }
 };
+// Lister tous les resultats selon un parent
+export const getAllExam_resultsStudentId = async (req: Request, res: Response) => {
+  try {
+    const studentId = req.params.student_id
+// Convertir parentId en ObjectId si nécessaire
+const studentObjectId = new mongoose.Types.ObjectId(studentId);
+    const exam_results = await ExamResult.find({ student_id: studentObjectId })
+      .populate('exam_id')    // Peupler les informations sur l'examen
+      .populate('course_id') // Peupler les informations sur le cours
+      .populate('student_id'); // Peupler les informations sur l'etudiant
+    if (exam_results.length === 0) {
+      return res.status(404).json({ message: "Aucun résultat trouvé pour les étudiants de ce parent.", studentId });
+    }
 
+    // Retourner la liste des résultats d'examens
+    res.status(200).json(exam_results);
+  } catch (error) {
+    console.error(error); // Pour mieux diagnostiquer l'erreur
+    res.status(500).json({ message: "Erreur serveur." });
+  }
+};
 // Obtenir un résultat d'examen par ID
 export const getExamResultById = async (req: Request, res: Response) => {
   try {

@@ -17,7 +17,6 @@ const router = Router();
 
 // Registration
 router.post("/register", validateUser, upload, register);
-
 // Login
 router.post("/login", login);
 
