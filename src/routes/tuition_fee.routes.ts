@@ -6,6 +6,7 @@ import {
   updateTuitionFee,
   deleteTuitionFee,
   getAllTuitionFeesParentId,
+  getTuitionFeesByStudentId,
 } from "../controllers/tuitionfee.controller";
 
 const router = Router();
@@ -25,5 +26,8 @@ router.put("/tuition-fees/:id", updateTuitionFee);
 
 // Route pour supprimer un paiement de frais de scolarité
 router.delete("/tuition-fees/:id", deleteTuitionFee);
+
+// Route pour récupérer les frais d'un étudiant
+router.get("/tuition-fees/student/:studentId", getTuitionFeesByStudentId);
 
 export default router;

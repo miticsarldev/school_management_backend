@@ -49,10 +49,8 @@ const TuitionFeeSchema = new Schema<ITuitionFee>({
     enum: ["unpaid", "paid", "overdue"],
     default: "unpaid",
   },
-  createdAt: {
-    type: Date,
-    default: Date.now,
-  },
+}, {
+  timestamps: true, // Pour ajouter les champs createdAt et updatedAt
 });
 
 // Méthode pour mettre à jour le statut de paiement

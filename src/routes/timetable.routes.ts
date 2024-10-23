@@ -5,6 +5,8 @@ import {
   updateTimetable,
   deleteTimetable,
   getTimetableById,
+  getTimetablesByClassroom,
+  getTimetablesByUser,
 } from "../controllers/timetable.controller";
 
 const router = Router();
@@ -23,5 +25,11 @@ router.put("/timetables/:id", updateTimetable);
 
 // Route pour supprimer un emploi du temps
 router.delete("/timetables/:id", deleteTimetable);
+
+// Route pour récupérer les emplois du temps d'une classe
+router.get("/timetables/classroom/:classroomId", getTimetablesByClassroom);
+
+// Route pour récupérer les emplois du temps d'un utilisateur
+router.get("/timetables/user/:userId", getTimetablesByUser);
 
 export default router;
