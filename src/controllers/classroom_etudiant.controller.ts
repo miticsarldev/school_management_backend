@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import ClassroomEtudiant from "../models/ClassroomEtudiant";
+import mongoose from "mongoose";
 
 // Ajouter une classroomEtudiant
 export const createClassroomEtudiant = async (req: Request, res: Response) => {
@@ -74,6 +75,23 @@ export const getClassroomEtudiantById = async (req: Request, res: Response) => {
     const { id } = req.params;
 
     const classroomEtudiant = await ClassroomEtudiant.findById(id).populate("classroom_id").populate("student_id");
+    if (!classroomEtudiant) {
+      return res.status(404).json({ message: "Salle de classe de l'etudiant introuvable" });
+    }
+
+    res.json(classroomEtudiant);
+  } catch (error) {
+    res.status(500).json({ message: "Erreur de serveur" });
+  }
+};
+// Afficher une classroomEtudiant par ID
+export const getClassroomEtudiantByStudentId = async (req: Request, res: Response) => {
+  try {
+    const studentId = req.params.student_id
+// Convertir parentId en ObjectId si nécessaire
+const studentObjectId = new mongoose.Types.ObjectId(studentId);
+    const classroomEtudiant = await ClassroomEtudiant.findOne({ student_id: studentObjectId })
+    .populate("classroom_id").populate("student_id");
     if (!classroomEtudiant) {
       return res.status(404).json({ message: "Salle de classe de l'etudiant introuvable" });
     }

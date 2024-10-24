@@ -30,9 +30,13 @@ const CourseSchema = new Schema({
     required: true,
   },
   statuses: {
-    type: Boolean,
-    default: true,
+    type: String,
+      enum: ["Completed", "Inprogress", "Incompleted"],
+      default: "Inprogress",
   },
+},
+{
+  timestamps: true,
 });
 
 const Course = model("Course", CourseSchema);

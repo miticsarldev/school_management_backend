@@ -7,7 +7,9 @@ import {
     getAttendanceByUser,
     getAllAttendancesParentId,
     getAllAttendances,
-    deleteAttendance
+    deleteAttendance,
+    getAttendanceStats,
+    getAttendancesByUserId
 } from '../controllers/attendance.controller';
 
 const router = express.Router();
@@ -27,7 +29,7 @@ router.get('/attendances/export/:timetable_id', exportAttendanceToCSV);
 
 // Récupérer les présences pour un utilisateur spécifique (étudiant)
 
-router.get('/attendances/user/:user_id', getAttendanceByUser);
+router.get('/attendances/user/:user_id', getAttendancesByUserId);
 // Route pour obtenir toutes les attendances 
 router.get("/attendances", getAllAttendances);
 // Route pour supprimer une attendance 

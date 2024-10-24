@@ -5,7 +5,7 @@ import {
   deleteHomework,
   getHomeworks,
   getHomeworkById,
-  getAllHomeworksParentId,
+  getHomeworksByUserId,
 } from "../controllers/homework.controller";
 
 const router = Router();
@@ -13,8 +13,8 @@ const router = Router();
 router.post("/homeworks", addHomework);
 router.get("/homeworks/:id", getHomeworkById);
 router.get("/homeworks", getHomeworks);
-// Route pour lister tous les devoirs par parent
-router.get("/homeworks-by-parent/:parentId", getAllHomeworksParentId);
+// Route pour lister tous les devoirs par user
+router.get("/homeworks-by-user/:userId", getHomeworksByUserId);
 router.put("/homeworks/:id", updateHomework);
 router.delete("/homeworks/:id", deleteHomework);
 

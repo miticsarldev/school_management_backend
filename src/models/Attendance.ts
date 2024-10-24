@@ -9,7 +9,7 @@ const attendanceSchema = new Schema<IAttendance>(
       type: Schema.Types.ObjectId,
       ref: 'User', // Référence au modèle User pour les étudiants
       required: false,
-    },
+    }, 
     teacher_id: {
       type: Schema.Types.ObjectId,
       ref: 'User', // Référence au modèle User pour les professeurs

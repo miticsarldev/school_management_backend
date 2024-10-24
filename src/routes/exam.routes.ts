@@ -1,5 +1,5 @@
 import express from 'express';
-import { addExam, getExams, getExamById, updateExam, deleteExam } from '../controllers/exam.controller';
+import { addExam, getExams, getExamById, updateExam, deleteExam, getExamsByUserId } from '../controllers/exam.controller';
 
 const router = express.Router();
 
@@ -11,6 +11,9 @@ router.get('/', getExams);
 
 // Route pour récupérer un examen par ID
 router.get('/:id', getExamById);
+
+// Route pour récupérer un examen par ID
+router.get('/exam_by_user/:user_id', getExamsByUserId);
 
 // Route pour modifier un examen
 router.put('/:id', updateExam);
