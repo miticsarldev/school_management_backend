@@ -152,3 +152,31 @@ export const deleteTuitionFee = async (req: Request, res: Response) => {
     }
   }
 };
+
+// Récupérer tous les frais de scolarité d'un étudiant spécifique par son ID
+export const getTuitionFeesByStudentId = async (req: Request, res: Response) => {
+  try {
+    const studentId = req.params.studentId; // ID de l'étudiant
+
+    // Vérifier si l'ID passé est un ObjectId valide
+    if (!mongoose.Types.ObjectId.isValid(studentId)) {
+      return res.status(400).json({ message: "ID de l'étudiant invalide." });
+    }
+
+    // Récupérer les frais de scolarité de l'étudiant
+    const tuitionFees = await TuitionFee.find({ student_id: studentId })
+      .populate("student_id") // Peupler les informations sur l'étudiant
+      .populate("classroom_id"); // Peupler les informations sur la classe
+
+    // Vérifier si des frais ont été trouvés pour cet étudiant
+    if (tuitionFees.length === 0) {
+      return res.status(404).json({ message: "Aucun frais trouvé pour cet étudiant." });
+    }
+
+    // Retourner la liste des frais
+    res.status(200).json(tuitionFees);
+  } catch (error: unknown) {
+    console.error("Erreur serveur:", error); // Pour diagnostiquer les erreurs
+    res.status(500).json({ message: "Erreur serveur." });
+  }
+};
