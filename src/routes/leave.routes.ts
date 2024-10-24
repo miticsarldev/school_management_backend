@@ -5,6 +5,7 @@ import {
   updateLeave,
   deleteLeave,
   getAllLeavesParentId,
+  getAllLeavesByUserId,
 } from "../controllers/leave.controller";
 
 const router = Router();
@@ -16,8 +17,9 @@ router.post("/leaves", createLeave);
 router.get("/leaves", getAllLeaves);
 
 // Route pour lister tous les demandes de congé par parent
-router.get("/leaves-by-user/:user_id", getAllLeavesParentId);
-
+router.get("/leaves-by-user/:user_id", getAllLeavesByUserId);
+// Route pour lister tous les demandes de congé par parent
+//router.get("/leaves-by-user/:user_id", getAllLeavesParentId);
 // Route pour mettre à jour une demande de congé ou absence existante
 router.put("/leaves/:id", updateLeave);
 

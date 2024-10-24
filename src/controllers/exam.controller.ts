@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import Exam from "../models/Exam";
-import mongoose from "mongoose";
+import mongoose, { ObjectId } from "mongoose";
 import User from "../models/User";
 import ExamResult from "../models/ExamResult";
 import Timetable from "../models/Timetable";
@@ -107,13 +107,14 @@ export const getExamsByUserId = async (req: Request, res: Response) => {
       // Récupérer les résultats d'examen des enfants
       examResults = await ExamResult.find({ student_id: { $in: studentIds } })
         .populate('course_id') // On récupère les détails du cours via course_id
-        .populate('student_id'); // On récupère aussi les informations de l'étudiant
-
+        .populate('student_id') // On récupère aussi les informations de l'étudiant
+        .populate('exam_id');
     } else if (user.role === 'etudiant') {
       // Récupérer les résultats d'examen de l'étudiant
       examResults = await ExamResult.find({ student_id: userObjectId })
-        .populate('course_id') // Récupérer les informations du cours
-        .populate('student_id');
+        .populate('course_id')// Récupérer les informations du cours
+        .populate('student_id')
+        .populate('exam_id');
     } else {
       return res.status(403).json({ message: "Rôle non autorisé pour cette action." });
     }
@@ -122,20 +123,31 @@ export const getExamsByUserId = async (req: Request, res: Response) => {
       return res.status(404).json({ message: "Aucun résultat d'examen trouvé." });
     }
 
-    // Récupérer l'emploi du temps associé aux cours trouvés dans les résultats d'examen
-    const courseIds = examResults.map(result => result.course_id);
-    const timetables = await Timetable.find({ cours_id: { $in: courseIds } });
+console.log('Examresults:', examResults);
+// Récupérer l'emploi du temps associé aux cours trouvés dans les résultats d'examen
+const courseIds = examResults.map(result => result.course_id._id);
+console.log('Course IDs:', courseIds);
 
-    // Structure de réponse combinant les résultats d'examen et les détails d'emploi du temps
-    const examsWithTimetables = examResults.map(result => {
-      const timetable = timetables.find(tt => String(tt.cours_id) === String(result.course_id));
+const timetables = await Timetable.find({ cours_id: { $in: courseIds } }).populate('classroom_id');
+console.log('Timetables:', timetables);
 
-      return {
-        exam_result: result, // Les détails du résultat d'examen (note, commentaire, etc.)
-        course: result.course_id, // Les détails du cours
-        timetable: timetable || null // Les détails d'emploi du temps pour ce cours, si disponible
-      };
-    });
+// Structure de réponse combinant les résultats d'examen et les détails d'emploi du temps
+const examsWithTimetables = examResults.map(result => {
+  // Utiliser result.course_id directement, car c'est déjà un ObjectId
+  const resultCourseId = String(result.course_id._id); // Convertir l'ObjectId en string pour la comparaison
+  // Trouver l'emploi du temps correspondant
+  const timetable = timetables.find(tt => String(tt.cours_id) === resultCourseId);
+  return {
+    exam_result: result, // Détails du résultat d'examen
+    course: result.course_id, // Détails du cours
+    timetable: timetable, // Détails de l'emploi du temps, si disponible
+  };
+});
+
+
+
+
+
 
     return res.status(200).json(examsWithTimetables);
   } catch (error) {

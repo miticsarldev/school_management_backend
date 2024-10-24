@@ -3,6 +3,7 @@ import Course from "../models/Course";
 import mongoose from "mongoose";
 import ClassroomEtudiant from "../models/ClassroomEtudiant";
 import Timetable from "../models/Timetable";
+import User from "../models/User";
 
 // Créer un nouveau cours
 export const createCourse = async (req: Request, res: Response) => {
@@ -44,6 +45,43 @@ export const getCourses = async (req: Request, res: Response) => {
     res.status(500).json({ message: "Erreur de serveur" });
   }
 };
+// Récupérer tous les enseignants qui enseignent dans la même classe que l'étudiant
+export const getTeachersByStudentClass = async (req: Request, res: Response) => {
+  try {
+     const studentId = req.params.student_id;
+     const studentObjectId = new mongoose.Types.ObjectId(studentId);
+ 
+     // Récupérer la classes associées à l'étudiant
+     const classroomEtudiant = await ClassroomEtudiant.findOne({ student_id: studentObjectId }).populate('classroom_id');
+ 
+     if (!classroomEtudiant ) {
+       return res.status(404).json({ message: "Aucune classe trouvée pour cet étudiant." });
+     }
+     // Trouver tous les cours dispensés dans la classe de l'étudiant
+     const coursesInClass = await Course.find({ id_classroom_etudiant: classroomEtudiant._id })
+     .populate("id_classroom_etudiant")
+     .populate("id_user");
+
+     if (coursesInClass.length === 0) {
+       return res.status(404).json({ error: "Aucun cours trouvé dans cette classe." });
+     }
+    // Récupérer les détails des cours à partir de `timetable`
+    const coursesWithTeacher = coursesInClass.map(t => {
+      return {
+        courseId: t._id, // Les informations sur le cours
+        name:t.name,
+        teacher: t.id_user, // Les informations sur l'enseignant
+      };
+    });
+
+    res.json(coursesWithTeacher);
+  } catch (error) {
+    // Gestion des erreurs
+    res.status(400).json({ error: 'Erreur lors de la récupération des enseignants pour la classe de l\'étudiant.' });
+  }
+};
+
+
 // Afficher les cours par StudentID avec les horaires
 export const getCourseByStudentId = async (req: Request, res: Response) => {
   try {
