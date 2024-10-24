@@ -128,7 +128,7 @@ export const assignParentToStudent = async (req: Request, res: Response) => {
 
 export const getUsers = async (req: Request, res: Response) => {
   try {
-    const users = await User.find();
+    const users = await User.find().populate('parent');
     res.json(users);
   } catch (error) {
     res.status(500).json({ message: "Server error" });

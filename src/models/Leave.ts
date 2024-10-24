@@ -16,11 +16,11 @@ const LeaveSchema = new Schema<ILeave>({
   exam_id: {
     type: Schema.Types.ObjectId,
     ref: "Exam", // Référence à l'examen
-    required: true,
   },
   status: {
-    type: Boolean,
-    default: false, // Statut par défaut: non approuvé
+    type: String,
+    required: true,
+    enum: ["pending", "validate","cancel"],
   },
   date: {
     type: Date,
@@ -29,7 +29,7 @@ const LeaveSchema = new Schema<ILeave>({
   type: {
     type: String,
     required: true,
-    enum: ["congé", "absence"], // Enum pour définir le type de demande
+    enum: ["congé", "absence","medical"], // Enum pour définir le type de demande
   },
 }, {
   timestamps: true, // Pour ajouter createdAt et updatedAt automatiquement

@@ -160,3 +160,21 @@ export const deleteLeave = async (req: Request, res: Response) => {
     res.status(400).json({ error: "Erreur lors de la suppression de la demande." });
   }
 };
+
+// Récupérer les congés d'un utilisateur spécifique
+export const getLeavesByUserId = async (req: Request, res: Response) => {
+  try {
+    const userId = req.params.user_id; // Récupère l'ID de l'utilisateur à partir des paramètres de la requête
+    
+    // Rechercher tous les congés associés à l'utilisateur
+    const leaves = await Leave.find({ user_id: userId }).populate("timetable_id").populate("exam_id");
+    
+    if (!leaves || leaves.length === 0) {
+      return res.status(404).json({ message: "Aucun congé trouvé pour cet utilisateur." });
+    }
+    
+    res.status(200).json(leaves); // Renvoie la liste des congés trouvés
+  } catch (error) {
+    res.status(500).json({ error: "Erreur lors de la récupération des congés de l'utilisateur." });
+  }
+};

@@ -37,6 +37,7 @@ const userSchema = Joi.object<IUser>({
   parent: Joi.string().optional().allow(null),
   lastLogin: Joi.date(),
   createdAt: Joi.date().default(Date.now),
+  parent: Joi.string().optional().allow(null)
 });
 
 export const validateUser = (

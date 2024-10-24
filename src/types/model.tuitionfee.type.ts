@@ -13,7 +13,6 @@ export interface ITuitionFee extends Document {
   student_id: Schema.Types.ObjectId; // Référence à l'étudiant
   classroom_id: Schema.Types.ObjectId; // Référence à la classe
   status: string;
-  createdAt: Date;
 
   // Méthode pour mettre à jour l'état du paiement
   updatePaymentStatus: (paidAmount: number) => void;

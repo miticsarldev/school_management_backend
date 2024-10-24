@@ -56,7 +56,7 @@ export const getAttendanceByTimeTable = async (req: Request, res: Response) => {
 export const getAllAttendancesParentId = async (req: Request, res: Response) => {
   try {
     const parentId = req.params.parent_id; // On suppose que l'ID du parent est passé dans les paramètres de la requête
-    
+
     // Convertir parentId en ObjectId si nécessaire
     const parentObjectId = new mongoose.Types.ObjectId(parentId);
 
@@ -149,15 +149,6 @@ export const exportAttendanceToCSV = async (req: Request, res: Response) => {
       .json({ message: "Erreur lors de l'exportation des présences", error }); // Gestion des erreurs
   }
 };
-// Contrôleur pour récupérer toutes les présences avec informations des clés étrangères
-export const getAllAttendances = async (req: Request, res: Response) => {
-  try {
-    // Récupérer toutes les présences et peupler les informations des utilisateurs et de l'emploi du temps
-    const attendances = await Attendance.find()
-      .populate('student_id', 'firstname lastname') // Peupler avec les champs firstname et lastname de l'utilisateur étudiant
-      .populate('teacher_id', 'firstname lastname') // Peupler avec les champs firstname et lastname de l'utilisateur enseignant
-      .populate('timetable_id'); // Peupler toutes les informations de l'emploi du temps
-
     console.log("Présences récupérées:", attendances);
     res.json(attendances); // Réponse avec la liste des présences peuplées
   } catch (error) {
@@ -265,10 +256,16 @@ export const getAttendanceByUser = async (req: Request, res: Response) => {
 
     let attendances;
     // Vérifiez le rôle de l'utilisateur et récupérez les présences en conséquence
-    if (user.role === "student") {
-      attendances = await Attendance.find({ student_id: user_id }); // Récupération des présences de l'étudiant
-    } else if (user.role === "teacher") {
-      attendances = await Attendance.find({ teacher_id: user_id }); // Récupération des présences de l'enseignant
+    if (user.role === "etudiant") {
+      attendances = await Attendance.find({ student_id: user_id })
+        .populate('student_id', 'firstname lastname') // Peupler avec les champs firstname et lastname de l'utilisateur étudiant
+        .populate('teacher_id', 'firstname lastname') // Peupler avec les champs firstname et lastname de l'utilisateur enseignant
+        .populate('timetable_id'); // Peupler toutes les informations de l'emploi du temps; // Récupération des présences de l'étudiant
+    } else if (user.role === "enseignant") {
+      attendances = await Attendance.find({ teacher_id: user_id })
+        .populate('student_id', 'firstname lastname') // Peupler avec les champs firstname et lastname de l'utilisateur étudiant
+        .populate('teacher_id', 'firstname lastname') // Peupler avec les champs firstname et lastname de l'utilisateur enseignant
+        .populate('timetable_id'); // Peupler toutes les informations de l'emploi du temps; // Récupération des présences de l'enseignant
     } else {
       return res
         .status(400)

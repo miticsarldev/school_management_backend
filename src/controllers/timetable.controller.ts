@@ -93,3 +93,51 @@ export const getTimetableById = async (req: Request, res: Response) => {
     });
   }
 };
+
+// Récupérer les emplois du temps d'une classe spécifique
+export const getTimetablesByClassroom = async (req: Request, res: Response) => {
+  try {
+    const classroomId = req.params.classroomId;
+
+    // Rechercher tous les emplois du temps pour une salle de classe spécifique
+    const timetables = await Timetable.find({ classroom_id: classroomId })
+      .populate("cours_id", "name") // Remplacer 'name' par les champs nécessaires
+      .populate("id_users", "name email") // Remplacer 'name', 'email' par les champs nécessaires
+      .populate("classroom_id", "name"); // Champs de la salle de classe
+
+    if (!timetables || timetables.length === 0) {
+      return res.status(404).json({ message: "Aucun emploi du temps trouvé pour cette salle de classe" });
+    }
+
+    res.status(200).json(timetables);
+  } catch (error) {
+    res.status(500).json({
+      message: "Erreur lors de la récupération des emplois du temps de la salle de classe",
+      error,
+    });
+  }
+};
+
+// Récupérer les emplois du temps d'un utilisateur spécifique
+export const getTimetablesByUser = async (req: Request, res: Response) => {
+  try {
+    const userId = req.params.userId;
+
+    // Rechercher tous les emplois du temps pour un utilisateur spécifique
+    const timetables = await Timetable.find({ id_users: userId })
+      .populate("cours_id") // Remplacer 'name' par les champs nécessaires
+      .populate("id_users", "name email") // Remplacer 'name', 'email' par les champs nécessaires
+      .populate("classroom_id"); // Champs de la salle de classe
+
+    if (!timetables || timetables.length === 0) {
+      return res.status(404).json({ message: "Aucun emploi du temps trouvé pour cet utilisateur" });
+    }
+
+    res.status(200).json(timetables);
+  } catch (error) {
+    res.status(500).json({
+      message: "Erreur lors de la récupération des emplois du temps de l'utilisateur",
+      error,
+    });
+  }
+};

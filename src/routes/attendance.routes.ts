@@ -38,7 +38,7 @@ router.delete("/attendances/:id", deleteAttendance);
 router.get('/attendance/user/:user_id', getAttendanceByUser);
 
 // Route pour obtenir les statistiques de présence
-router.get('/attendance/stats', getAttendanceStats);
+// router.get('/attendance/stats', getAttendanceStats);
 
 // Route pour obtenir toutes les attendances 
 router.get("/attendances", getAllAttendances);
